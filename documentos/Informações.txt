@@ -1,0 +1,30 @@
+cs.baylor.edu/~donahoo/practical/CSockets/textcode.html
+
+google -> socket tcp c++
+
+udpEchoServer.c
+udpEchoClient.c
+DieWithError.c
+
+para compilação : gcc -o <saida> udpEchoServer.c DieWithError.c
+
+-Sockets:
+
+
+./UDPEchoServer <UDP SERVER PORT>
+Exemplo: 
+./UDPEchoServer 10000
+
+./UDPEchoClient <Server IP> <Echo Word> [<Echo Port>]
+Exemplo:
+./UDPEchoClient 127.0.0.1 Teste 10000
+
+SVN do trabalho:
+http://code.google.com/p/tf-redes2/
+
+
+
+
+
+
+
