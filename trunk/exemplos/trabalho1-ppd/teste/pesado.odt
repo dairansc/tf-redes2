@@ -1,0 +1,11 @@
+Copy sequence of characters from string
+Copies a sequence of characters from the string content to the array pointed by s. This sequence of characters is made of the characters in the string that start at character position pos and span n characters from there.
+
+The function does not append a null character after the content copied. To retrieve a temporary c-string value from a string object, a specific member function exists: c_str.
+
+Parameters
+
+s
+    Array where the sequence of characters is copied. The storage space of the array shall already be allocated and should be large enough to contain n characters.
+n
+    Number of characters to be copied. If this number is greater than the amount of characters between pos and the end of the string content, only those characters between pos and the end of the string are copied.
