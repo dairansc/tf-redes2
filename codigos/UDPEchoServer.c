@@ -9,15 +9,48 @@
 
 void DieWithError(char *errorMessage);  /* External error handling function */
 
+/*Se o arquivo existir o valor 1 (true) será retornado. Caso
+  contrário a função retornará 0 (false). */
+int file_exists(const char *filename)
+{
+  FILE *arquivo;
+  int tam = strlen(filename);
+	printf("file exist %s %d\n",filename,tam);
+
+  if(arquivo = fopen(filename, "rb"))
+  {
+    fclose(arquivo);
+    return 1;
+  }
+  return 0;
+}
+
+/*Alterar nome do arquivo, em caso de teste em localhost. */
+void altera_nome_arquivo (char nome_antigo[ECHOMAX], char *nome_novo)
+{
+	int tam = strlen(nome_antigo);
+	//busca extensao do arquivo
+	char *p = strrchr(nome_antigo, '.');
+	*p++;
+	
+	strncat(nome_novo,nome_antigo,tam-4);
+	strcat(nome_novo, "2");
+	strcat(nome_novo, p);
+	printf("Novo nome de arquivo %s\n",nome_novo);
+}
+
 int main(int argc, char *argv[])
 {
     int sock;                        /* Socket */
     struct sockaddr_in echoServAddr; /* Local address */
     struct sockaddr_in echoClntAddr; /* Client address */
     unsigned int cliAddrLen;         /* Length of incoming message */
-    char echoBuffer[ECHOMAX];        /* Buffer for echo string */
+    char echoBuffer[ECHOMAX], nome_arquivo[ECHOMAX];        /* Buffer for echo string */
     unsigned short echoServPort;     /* Server port */
     int recvMsgSize;                 /* Size of received message */
+    FILE *arq;
+    int iniciaComunicacao = 0;
+    char buffer;
 
     if (argc != 2)         /* Test for correct number of parameters */
     {
@@ -46,18 +79,60 @@ int main(int argc, char *argv[])
         /* Set the size of the in-out parameter */
         cliAddrLen = sizeof(echoClntAddr);
 
-        /* Block until receive message from a client */
-        if ((recvMsgSize = recvfrom(sock, echoBuffer, ECHOMAX, 0,
-            (struct sockaddr *) &echoClntAddr, &cliAddrLen)) < 0)
-            DieWithError("recvfrom() failed");
+        if (iniciaComunicacao == 0) 
+        {
+		        /* Bloqueado até que receba a mensagem do cliente */
+		        if ((recvMsgSize = recvfrom(sock, echoBuffer, ECHOMAX, 0,
+		            (struct sockaddr *) &echoClntAddr, &cliAddrLen)) < 0)
+		            DieWithError("recvfrom() failed");
+		
+		        printf("Handling client %s\n", inet_ntoa(echoClntAddr.sin_addr));
+		        printf("Received: %s\n", echoBuffer);
+            
+            strcpy(nome_arquivo, echoBuffer);
+            
+            if (file_exists(echoBuffer) == 1)
+              altera_nome_arquivo(echoBuffer,nome_arquivo);
+            
+						//if((arq = fopen(nome_arquivo,"wb")) == NULL)
+						if((arq = fopen("teste2.doc","wb")) == NULL)
+						{
+							printf("Erro ao abrir o arquivo cópia %s\n",echoBuffer);
+							strcpy(echoBuffer, "Erro ao abrir o arquivo cópia\n");
+			        /* Envia um datagrama de volta para o cliente informando erro*/
+			        if (sendto(sock, echoBuffer, recvMsgSize, 0, 
+			             (struct sockaddr *) &echoClntAddr, sizeof(echoClntAddr)) != recvMsgSize)
+			            DieWithError("sendto() sent a different number of bytes than expected");
+						}
+		  
+		        /* Envia um datagrama de volta para o cliente em caso de erro*/
+		        if (sendto(sock, echoBuffer, recvMsgSize, 0, 
+		             (struct sockaddr *) &echoClntAddr, sizeof(echoClntAddr)) != recvMsgSize)
+		            DieWithError("sendto() sent a different number of bytes than expected");
 
-        printf("Handling client %s\n", inet_ntoa(echoClntAddr.sin_addr));
-        printf("Received: %s\n", echoBuffer);
-
-        /* Send received datagram back to the client */
-        if (sendto(sock, echoBuffer, recvMsgSize, 0, 
-             (struct sockaddr *) &echoClntAddr, sizeof(echoClntAddr)) != recvMsgSize)
-            DieWithError("sendto() sent a different number of bytes than expected");
+		        iniciaComunicacao = 1;
+	       }
+	       else
+	       {
+		        /* Bloqueado para receber conteudo do arquivo */
+		        if ((recvMsgSize = recvfrom(sock, &buffer, ECHOMAX, 0,
+		            (struct sockaddr *) &echoClntAddr, &cliAddrLen)) < 0)
+		            DieWithError("recvfrom() failed");
+		
+            if (strcmp(&buffer,"fim") == 0)
+            {
+              fclose(arq);
+   		        iniciaComunicacao = 0;
+   		        strcpy(echoBuffer, nome_arquivo);
+            }
+            else
+              fwrite(&buffer,sizeof(buffer),4, arq);   
+		    
+		        /* Envia confirmação para cliente */
+		        if (sendto(sock, echoBuffer, recvMsgSize, 0, 
+		             (struct sockaddr *) &echoClntAddr, sizeof(echoClntAddr)) != recvMsgSize)
+		            DieWithError("sendto() sent a different number of bytes than expected");
+				 }
     }
     /* NOT REACHED */
 }
