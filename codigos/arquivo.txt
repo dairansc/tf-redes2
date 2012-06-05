@@ -1,0 +1,114 @@
+Inicio do arquivo
+                                               .++.                                                 
+                                              .?I++.                                                
+                                                $+.                                                 
+                                               7IZ$.                                                
+                                              .$+$$.                                                
+                                            .+::::::::$.                                            
+                                        ..$::::+$I+:::::..                                          
+                                        I++I$+::++::??:+7?: .                                       
+                                     .+ZI?:7$:I++++?::+?++:?$                                       
+                                    ..$+$+?Z$?=???I+?I?++~:$7.                                      
+                                    .$+?$??:::::::::::7+++?+$.                                      
+                                    .+?::::++:I:::::++?:::~++.                          . +:        
+      $$+$                          +$$:::++?=+:+??:?7I++::$$.                        +=:~+.        
+       ?+$I+.                      .?+$+?:::+::~++7::++::$$$+?                       ::=~:          
+       .$?+++$.                     .+$:+++7+7++Z+++$?+?+:+$I.                     +::::=+          
+     .$I$+$++++I.                    .++++7+$+++II+++I7+?+=$~                     :::~=::::=:=      
+    I++?++++++++...                  .?+++++?::::?::::?+II$?$.                 ~::+::~:::~::::=     
+   $+++++I+++7$$+++$.               .$?$+,:::::?I+I::::::$??.                 :::::::::::::::::.    
+ .7?++++++?7+++?+++++.               .$$+?$::~:+?+::++=+:$7$.   ,DODD     ++:::::=::::::::::::=::   
+.+++++++++++++++++I++$?7=   .8OOOZD   +$++$:I+::+:I::+:$$$$+. NNDNOOOO.   ::+=:::::::::~::::::::::  
+$++7?++++++++++?+++++?I+?..ZOOOD. NON.++$$::+::?++++?:I?:+?+.NOO  NNOON .::::==:::=:::: ::==::::::  
+ :+7++++.+.++++++++$?7++++.N7.    IOO  $$7?++?++++++7+++++$. OOO    ZII+:::== =:+:::::::..:::: ~.   
+  . +I++$..+7+++++7?....$++D=$    8OO .??+++$+++++++?+$+++7$ OOZ    ~DD:~+.   +~::::::= :.~:=:.     
+    .++?+++++++++++7      $+I+.  =OON .$?+++++++++++++++++7? +OOZ. :+:~=       :=:::::::::,=+       
+        +++7++++?I+        .$+++$OOD    ,?++++++++++++++$,    ?OOOD,::          ~::,::::::=         
+        .++.+++=$Z.         ..+++++8       NZ88$$$?OOOD.      +:OOON+.            .:::+ +           
+           $?+?+.             N$+++++I~    OOOO.   8OOOO   +~::::NOOO.             :::~             
+            7+?.             .OO$+++++++$.DDOON     OOO8,=::::::::OOON             .:               
+                 ............ZOO$.++++OOOO8OOOOOOOOOOOOOOOO:::::=.D88D.......... .                  
+                 ..      NN  ~OO.     OO8OOOOOOOOOOOOOOOOOON           :N       NN                  
+                 ..     DDDN .DOO..   ONDOONOOOOOOOOOOOOOOON    .     INNN+     NN                  
+                 .N      DD    NOOZ .8DOONOOOOOOOOOOOOOOOOON    N       N       ND                  
+                 .D.            .NNDODDOOOOOOOOOOOOOOOOOOOON   .N . .         . NN                  
+                 .NNNN.      .NNNDNN,.OOOOOOOOOOOOOOOOOOOOON NNNDDN..       DNNNNN                  
+                 .N              N.   OOOOOOIO.O.Z.OOOOOOOON    N               NN                  
+                 .D.            ?NN   OOOOZ.OOOOOOOOZ.OOOOON   DN=             NNN                  
+                 .NN,          .?NN.  OOOOOO~$.I.7.$.OOOOOON   DN.      +     .NNN                  
+                 .N.     ~N      N    OOOOOOOOOO7OOOOOOOOOON  . D.     .N     .NNN                  
+                 ..   . 8D.N .        OOOO$++:O+O+O7Z+OOOOON,         ,NNN: .   NN                  
+                 ..                   OOOOOOO+++O.O+OOOOOOON           .N       NN                  
+                 ..      NN           OOOOOO?+I+O.O+OOOOOOON           +N       NN                  
+                 ..     DND.          OOOO+OZ+O+O.O+OOIOOOON          ,NND      NN..                
+             ..==:+     DND      N.   OO+.:O++?+O+O+OO~Z$OON   .I     .NDN      NN?+++Z.            
+           =::=:::D              N.   O,+O+Z++.O++O+OO=O++ON    N               NN$+++7+$$.         
+         +:=:::+::NNDD.        NNDNND OO+~.O.O+O+O.O$O.+.OON..NNNNDN.       ,,NNNN ..++++++$        
+       ~:=:::::~ .N              N.   OOO.,++$O7OOO++7?,OOON   .N               NN   .++++$$$.      
+      +::=::::.  .N              N.   OOOOOOOOOOOOOOOOOOOOON  .NN.             NNN    $++$+$$$.     
+     +::=:=::+   .NN           +NND   OOOOOOOOOOOOOOOOOOOOON  NNNN            NNNN    I++$.+$+$     
+    =::=:  :=+   .NN     =      NNN   OOOOOOOOOOOOOOOOOOOOON  INNN      N     NNNN  ..+$+  =+++.    
+    ~+:::  =:~++ ..      O            OOOOOOOOOOOOOOOOOOOOON           .D       NN.I++7+$  .+$+$.   
+   .::=: .=::::~+..   ~NNNDN          OOOOOOOOOOOOOOOOOOOOON         8NN$N.     NN++?+7++?. +$++.   
+   .::~:=:~::::+==.      D            OOOOOOOOOOOOOOOOOOOOON           .N       NN.+7++$+7+++$++.   
+   .:::=:::.  +:==.     .NN           OOOOOOOOOOOOOOOOOOOOON           ND       NN7.$~.. .?++++$    
+   .:+::+:       =N      NN       .   OOOOOOOOOOOOOOOOOOOOON   .       ND.      NN++      ~++$+.    
+    ::::=$..     :D      N       N    OOOOOOOOOOOOOOOOOOOOON    N      ..       NN+$   .OZO++++.    
+     +::$Z$O$...ZON              D    OOO+OOOOOOOOOOOO+OOOON   .N              .NNZZ..OZZZ$$++.     
+     .=:ZZZZZZZ$O:N .         8NNDNN .OOO+++OOOOOOOO+++OOOON ZNNNN8 .        ...NN+OZZZZZZZ?I$~.    
+     :::ZZZZZZZOO:N              N.   OOO+++++OOOOO++++OOOON    N              =NN.OZZZZZZZO++++.   
+   .:+:OZZZZZZZZO:NN            NND   OOO+++++++O++++++OOOON   ND      .I     8NNN=OZZZZZZZOI++I.   
+    ::~OZZZZZZZZO:NN     N      DN?   OOO7+++++++++++++OOOON  .NN.     .N     INNN+OZZZZZZZZ.$$$$   
+    .= OZZZZZZZOOO......ZZ:Z..........ZOOO+++++++++++++OOOON..........,ZIN......NN?O$ZZZZZZ$.       
+       OZZZZZZZOOOZOOOOOOOOOOOOOOOOOOO?++++++++++++++++++++++OOOOOOOOOOOOOOOOOOONNOOZZZZZZZ$.       
+       OZZZZZZZOOOZ:OOOOOOOOOOOOOO+++++++++++++++++++++++++++++OOOOOOOOOOOOOOOONDOOO$ZZZZZZ$.       
+       IZZZZZZZOOOOOOOOOOOOOOOOOOOOZ++++++++++++++++++++++++IOOOOOOOOOOOOOOOOO8NZOOOZZZZZZZ$.       
+        ZZZZZZZOOOOOIOOOOOOOOOOOOOOOOO++++++++++++++++++++OOOOOOOOOOOOOOOOOOOONNOOOOZZZZZZZ$.       
+        ZZZZZZZOOOO. ZOOOOOOOOOOOOOOOOOO+++++++++++++++++OOOOOOOOOOOOOOOOOOOONN.OOOOZZZZZZZZ.       
+        ZZZZZZZOOOZ  .OOOOOOOOOOOOOOOOOO++++++++++++++++++OOOOOOOOOOOOOOOOOONN  ,OOOZZZZZZZ$.       
+       :ZZZZZZZZOOO   .ZOOOOOOOOOOOOOOO++++++++++++++++++++OOOOOOOOOOOOOOOONN.  .OOOZZZZZZZZ.       
+        ZZZZZZZZOOO    .OOOOOOOOOOOOOOI+++++++++++++++++++++OOOOOOOOOOOOOONN    .OOZZZZZZZZO        
+        ZZZZZZZZOOO     .OOOOOOOOOOOOZ++++++OO++++++OOOOOI+++OOOOOOOOOOOONN.    .OOZZZZZZZZO        
+        OZZZZZZZ$OO.     .OOOOOOOOOOO+OOOOOOOOI+++++OOOOOOOOOOOOOOOOOOOONN.     .OO$.$ZZZZ$.        
+        .ZZ..$+. OO:      .~OOOOOOOOOOOOOOOOOOO++++OOOOOOOOOOOOOOOOOOONNZ       .OZ.=$ZZZZO         
+        .OZ$.$..$$O?        .OOOOOOOOOOOOOOOOOOO?+OOOOOOOOOOOOOOOOOOONN         OZI.Z..~Z$          
+         .OZ$.Z$ZZZO         .7OOOOOOOOOOOOOOOOOO+OOOOOOOOOOOOOOOOONNN.        OOZ$$ZZZZ$O          
+         .OZ.ZZZZ$.,O.         .D..      ?.             N      .MNNN          7O$ .$ZZZZOO          
+          ZO$ZZZ.ZZ,7OO           .N..   NN.           .N   .,NNDN.          OO$.$ZZ..Z$OO          
+          .OO$.ZZZZZ ZO+.            =DN,NDD          ..NNNNNNN             OOZ...ZZ$ZZOOO          
+          +OOO$.ZZZ,.ZZOO.              .7NNNNND7+$DNNNNNNND .            .OO$.ZZZZ$.ZOOOO          
+         .OOOOZZ...$ZZZZOO.                    . .~, ..                 .ZO$$Z$.ZZZZ.OOOOO          
+         .OOOOOZ$ZZZZZZZZZOO.                                          .OOZZI$ZZ....OOOOOOO         
+         .OOOOOOOZZZZZZZZ.$ZOO.                                      OOOZZZZZ.$ZZZZOOOOOOOO         
+         .OOOOOOOOOZZZZZ$.ZZZZOOO                                 .OOO$Z$...ZZ.$ZZOOOOOOOOI         
+         .OOOOOOOOOOZZZZ.:Z$+.:Z$OOZ...                       ..~OOZ$I. .,$Z$~.ZOOOOOOOOOO          
+          ZOOOOOOOOO.O$Z. .+ZZZZZ.Z$ZOOOO..               ..OOOZZZZ .ZZZZ..ZZZ$~.OOOOOOOOO          
+          .OOOOOOOOZ .OZZZZZZZZZ7.$I..ZZOOOOOO7      ZOOOOOZ$ZZZZZZZ.ZZZZ$~ZZO. .OOOOOOOOO          
+          ~OOOOOOOOO   .ZZZZZZZ$.$ZZZZZ$ .$$ZZZZOOOO$$ZZZZZZ..ZZZZZZZ.$Z.7Z$    .OOOOOOOOZ.         
+          OOOOOOOOO       OZZ$$.ZZ$..$Z$.ZZ=.ZZ $ZZZ ?Z$.,ZZ.$.ZZZZZZ..ZO        .IOOOOOO7          
+                            .O$..ZZZZZ$.~$ZZ.ZZ$.$Z..ZZI$$.Z.$I.ZZZZZO.                             
+                              ..ZOZ$ZZ$.$.~$ZZZZ$.$.ZZ$.ZZ$ ZZZ.ZZOO..                              
+                                   ..ZZZZZ$..,ZZZ$.$ZZ$$ZZZZZ$O=                                    
+                                         .OOOOOZ$$Z$Z$OZ:OI..                                       
+                                               .......                                              
+                                                                                                    
+                                               ...?ZZI...                               ...:,....   
+.ZZZZZZZZZZZZZ.. ZZZZZZ          ,ZZZZZ     .ZZZZZZZZZZZZZZ  ~~~~~~~~~~~~..         .=~~~~~~~~~~~   
+.ZZZZZZZZZZZZZZZ..ZZZZ.           ZZZZ.    ZZZZZZZZZZZZZZZZ  ~~~~~~.,~~~~~=.       =~~~~~....:~~~   
+ +ZZZ.     .ZZZZZ.ZZZZ            ZZZZ   $ZZZZZ.        .:Z  ,~~~.     .~~~~.     ~~~~~.        .   
+ +ZZZ.      .ZZZZZZZZZ            ZZZZ  ZZZZZ                ,~~~.      .~~~~    .~~~~,             
+ +ZZZ.       ZZZZZZZZZ            ZZZZ .ZZZZ                 ,~~~.      .~~~=     =~~~~.            
+ +ZZZ.       ZZZZ.ZZZZ            ZZZZ ZZZZ:                 ,~~~.     .~~~~.     .~~~~~.           
+ +ZZZ.      7ZZZZ.ZZZZ            ZZZZ.ZZZZ.                 ,~~~.    .~~~=.       .=~~~~~~..       
+ +ZZZ.   ..ZZZZ. .ZZZZ            ZZZZ.ZZZZ                  ,~~~..~~~~~~.           .~~~~~~~~:..   
+ +ZZZ..ZZZZZ,..  .ZZZZ            ZZZZ.ZZZZ.                 ,~~~..~~~~.               .,~~~~~~~=   
+ +ZZZ.           .ZZZZ            ZZZZ.ZZZZ.                 ,~~~.  =~~~.                 ..=~~~~~~ 
+ +ZZZ.           .ZZZZ            ZZZZ.ZZZZZ                 ,~~~.   ~~~~~                    ~~~~~.
+ +ZZZ.           .ZZZZ.           ZZZZ .ZZZZZ                ,~~~.    =~~~~.                   ~~~~~
+ +ZZZ.           .ZZZZZ           ZZZZ  ZZZZZZ               ,~~~.     ,~~~~.                  ~~~=.
+ +ZZZ.            .ZZZZ$.       .ZZZZZ   ~ZZZZZZ.        .=Z.,~~~.      .~~~~..  .~,          ~~~~, 
+ ZZZZ=             .ZZZZZZ,..7ZZZZZZZZ.    ZZZZZZZZZZZZZZZZZ.~~~~~       .=~~~~. .~~~~~~...~~~~~~   
+.ZZZZZ,.             ,ZZZZZZZZZZ. ZZZZZ.     .ZZZZZZZZZZZZZ..~====..       .~~~=~.:~~~~~~~~~~~~.    
+                       ........                 .........                           . .......       
+http://www.glassgiant.com/ascii/
+Fim do arquivo

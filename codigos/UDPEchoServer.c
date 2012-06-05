@@ -4,6 +4,7 @@
 #include <stdlib.h>     /* for atoi() and exit() */
 #include <string.h>     /* for memset() */
 #include <unistd.h>     /* for close() */
+#include "DieWithError.c"
 
 #define ECHOMAX 255     /* Longest string to echo */
 
@@ -95,7 +96,7 @@ int main(int argc, char *argv[])
               altera_nome_arquivo(echoBuffer,nome_arquivo);
             
 						//if((arq = fopen(nome_arquivo,"wb")) == NULL)
-						if((arq = fopen("teste2.doc","wb")) == NULL)
+						if((arq = fopen("teste2.txt","wb")) == NULL)
 						{
 							printf("Erro ao abrir o arquivo cópia %s\n",echoBuffer);
 							strcpy(echoBuffer, "Erro ao abrir o arquivo cópia\n");
