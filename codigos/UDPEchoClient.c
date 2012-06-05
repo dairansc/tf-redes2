@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 	int echoStringLen;               /* Length of string to echo */
 	int respStringLen;               /* Length of received response */
 	FILE *arq;
-	char buffer;
+	char buffer[ECHOMAX];
 	
 	if ((argc < 3) || (argc > 4))    /* Test for correct number of arguments */
 	{
@@ -79,10 +79,11 @@ int main(int argc, char *argv[])
 	/* Transfere conteudo do arquivo para servidor */
 	while(!feof(arq)) 
 	{
-		fread(&buffer, sizeof(buffer),4,arq);
-		echoStringLen = sizeof(buffer)*4;
+		fread(&buffer, sizeof(buffer),1,arq);
+		echoStringLen = sizeof(buffer)*1;
 		
 		/* Envia conteudo do arquivo para o servidor */
+		printf("%s",buffer);
 		if (sendto(sock, &buffer, echoStringLen, 0, (struct sockaddr *) &echoServAddr, sizeof(echoServAddr)) != echoStringLen)
 			DieWithError("sendto() sent a different number of bytes than expected");
 	

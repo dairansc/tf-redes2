@@ -18,7 +18,7 @@ int file_exists(const char *filename)
   int tam = strlen(filename);
 	printf("file exist %s %d\n",filename,tam);
 
-  if(arquivo = fopen(filename, "rb"))
+  if(arquivo = fopen(filename, "r"))
   {
     fclose(arquivo);
     return 1;
@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
               altera_nome_arquivo(echoBuffer,nome_arquivo);
             
 						//if((arq = fopen(nome_arquivo,"wb")) == NULL)
-						if((arq = fopen("teste2.txt","wb")) == NULL)
+						if((arq = fopen("teste2.pps","wb")) == NULL)
 						{
 							printf("Erro ao abrir o arquivo cópia %s\n",echoBuffer);
 							strcpy(echoBuffer, "Erro ao abrir o arquivo cópia\n");
