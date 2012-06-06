@@ -5,8 +5,7 @@
 #include <string.h>     /* for memset() */
 #include <unistd.h>     /* for close() */
 #include "DieWithError.c"
-
-#define ECHOMAX 255     /* Longest string to echo */
+#include "biblioteca.c"
 
 void DieWithError(char *errorMessage);  /* External error handling function */
 
@@ -27,7 +26,7 @@ int file_exists(const char *filename)
 }
 
 /*Alterar nome do arquivo, em caso de teste em localhost. */
-void altera_nome_arquivo (char nome_antigo[ECHOMAX], char *nome_novo)
+void altera_nome_arquivo (char nome_antigo[BUFFERMAX], char *nome_novo)
 {
 	int tam = strlen(nome_antigo);
 	//busca extensao do arquivo
@@ -46,7 +45,7 @@ int main(int argc, char *argv[])
     struct sockaddr_in echoServAddr; /* Local address */
     struct sockaddr_in echoClntAddr; /* Client address */
     unsigned int cliAddrLen;         /* Length of incoming message */
-    char echoBuffer[ECHOMAX], nome_arquivo[ECHOMAX];        /* Buffer for echo string */
+    char echoBuffer[BUFFERMAX], nome_arquivo[BUFFERMAX];        /* Buffer for echo string */
     unsigned short echoServPort;     /* Server port */
     int recvMsgSize;                 /* Size of received message */
     FILE *arq;
@@ -83,7 +82,7 @@ int main(int argc, char *argv[])
         if (iniciaComunicacao == 0) 
         {
 		        /* Bloqueado até que receba a mensagem do cliente */
-		        if ((recvMsgSize = recvfrom(sock, echoBuffer, ECHOMAX, 0,
+		        if ((recvMsgSize = recvfrom(sock, echoBuffer, BUFFERMAX, 0,
 		            (struct sockaddr *) &echoClntAddr, &cliAddrLen)) < 0)
 		            DieWithError("recvfrom() failed");
 		
@@ -116,7 +115,7 @@ int main(int argc, char *argv[])
 	       else
 	       {
 		        /* Bloqueado para receber conteudo do arquivo */
-		        if ((recvMsgSize = recvfrom(sock, &buffer, ECHOMAX, 0,
+		        if ((recvMsgSize = recvfrom(sock, &buffer, BUFFERMAX, 0,
 		            (struct sockaddr *) &echoClntAddr, &cliAddrLen)) < 0)
 		            DieWithError("recvfrom() failed");
 		
