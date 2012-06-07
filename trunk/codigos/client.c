@@ -14,15 +14,15 @@ int main(int argc, char *argv[])
 	int sock;                        /* Socket descriptor */
 	struct sockaddr_in servAddr; /* Echo server address */
 	struct sockaddr_in fromAddr;     /* Source address of echo */
+	struct fileHeader arqProp;
+	struct fileHeader *teste;
+	
 	unsigned short porta;     /* Echo server port */
 	unsigned int fromSize;           /* In-out of address size for recvfrom() */
 	char *servIP;                    /* IP address of server */
 	char *nomeArquivo;                /* String to send to echo server */
-	//int porta;
 	char echoBuffer[BUFFERMAX+1];      /* Buffer for receiving echoed string */
-	int nomeArquivoLen;               /* Length of string to echo */
 	int respStringLen;               /* Length of received response */
-	unsigned long fileSize;
 	FILE *arquivo;
 	char buffer[BUFFERMAX];
 	
@@ -36,6 +36,7 @@ int main(int argc, char *argv[])
 	nomeArquivo = argv[2];  // Segundo argumento: Nome do Arquivo que será enviado
 	
 	
+	//printf("%s", arqProp.nome);
 	if (!argv[3] || !atoi(argv[3])) // Terceiro argumento: Testa se a porta do servidor está válida
 	{
 	    printf("Atenção: Porta não definida, assumindo porta padrão '%d' para servidor '%s'.\n", PORTAPADRAO, servIP);
@@ -46,38 +47,30 @@ int main(int argc, char *argv[])
 	    porta = atoi(argv[3]);
 	}
 	
-	//printf("Arquivo: %s\nPorta: %d\n", nomeArquivo, porta);
-	
-	//if ((nomeArquivoLen = strlen(nomeArquivo)) > BUFFERMAX)  /* Check input length */
-	//		DieWithError("Nome de arquivo excede o tamanho máximo!\n");
 	
 	if((arquivo = fopen(nomeArquivo, "rb")) == NULL)
 	{
-		fprintf(stderr, "Erro ao abrir o arquivo original %s\n", nomeArquivo);
+		fprintf(stderr, "Erro ao abrir o arquivo original %s\n", arqProp.nome);
 		exit(1);
 	}             
 
     fseek(arquivo, 0, SEEK_END); // posiciona ponteiro no final do arquivo
-    fileSize = ftell(arquivo);   // pega o valor corrente do ponteiro
+    arqProp.tamanho = ftell(arquivo);   // pega o valor corrente do ponteiro
     fseek(arquivo, 0, SEEK_SET); // posiciona de volta no início do arquivo
     
     nomeArquivo = nomeBaseArquivo(nomeArquivo);
+    arqProp.tamanhoNome = strlen(nomeArquivo);
     
-//    exit(1);
-//	if (argc == 4)
-//			porta = atoi(argv[3]);  /* Use given port, if any */
-//	else
-//			porta = 7;  /* 7 is the well-known port for the echo service */
-
-    nomeArquivoLen = strlen(nomeArquivo);
-
-    if( (sizeof(unsigned long)+sizeof(int)+nomeArquivoLen) > BUFFERMAX)
+    if( arqProp.tamanhoNome > NOMEARQUIVOMAX)
     {
         fprintf(stderr,"Nome de arquivo excede o tamanho máximo!\n");
         exit(1);
     }
+    
+    
+    sprintf(arqProp.nome, "%s", nomeArquivo);
 
-    printf("Abriu arquivo: %s\nTamanho: %d\n", nomeArquivo, fileSize);
+    printf("Abriu arquivo: %s\nTamanho: %li\n", arqProp.nome, arqProp.tamanho);
 
 	// Cria um socket datagrama/UDP
 	if ((sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0)
@@ -93,24 +86,21 @@ int main(int argc, char *argv[])
 	// Limpa dados do buffer
     memset(buffer, 0, sizeof(buffer));
     
+    memcpy(buffer, &(arqProp), sizeof(struct fileHeader));
     
-    //memcpy(buffer, fileSize, sizeof(unsigned long));
-    //memcpy(buffer+sizeof(unsigned long), (char)nomeArquivoLen, sizeof(int));
-    //memcpy(buffer+sizeof(unsigned long)+sizeof(int), nomeArquivo, nomeArquivoLen);
-    
-    //memcpy(buffer, fileSize, sizeof(unsigned long));
-    memcpy(buffer+sizeof(unsigned long)+1, nomeArquivo, nomeArquivoLen);
-    char *nome;
+    teste = (struct fileHeader *)buffer;
 
-    printf("%s\n",buffer+sizeof(unsigned long)+1);
-	exit(1);
+    printf("%s\n",teste->nome);
+	
+	
     // Envia cabeçalho do arquivo para o servidor
-    if (sendto(sock, nomeArquivo, nomeArquivoLen, 0, (struct sockaddr *) &servAddr, sizeof(servAddr)) != nomeArquivoLen)
+    if (sendto(sock, buffer, BUFFERMAX, 0, (struct sockaddr *) &servAddr, sizeof(servAddr)) != arqProp.tamanhoNome)
       DieWithError("sendto() sent a different number of bytes than expected");
 	
+	exit(1);
 	/* Recv a response */
 	fromSize = sizeof(fromAddr);
-	if ((respStringLen = recvfrom(sock, echoBuffer, BUFFERMAX, 0, (struct sockaddr *) &fromAddr, &fromSize)) != nomeArquivoLen)
+	if ((respStringLen = recvfrom(sock, echoBuffer, BUFFERMAX, 0, (struct sockaddr *) &fromAddr, &fromSize)) != arqProp.tamanhoNome)
 		DieWithError("recvfrom() failed");
 	
 	if (servAddr.sin_addr.s_addr != fromAddr.sin_addr.s_addr)
@@ -123,16 +113,16 @@ int main(int argc, char *argv[])
 	while(!feof(arquivo)) 
 	{
 		fread(&buffer, sizeof(buffer),1,arquivo);
-		nomeArquivoLen = sizeof(buffer)*1;
+		arqProp.tamanhoNome = sizeof(buffer)*1;
 		
 		/* Envia conteudo do arquivo para o servidor */
 		printf("%s",buffer);
-		if (sendto(sock, &buffer, nomeArquivoLen, 0, (struct sockaddr *) &servAddr, sizeof(servAddr)) != nomeArquivoLen)
+		if (sendto(sock, &buffer, arqProp.tamanhoNome, 0, (struct sockaddr *) &servAddr, sizeof(servAddr)) != arqProp.tamanhoNome)
 			DieWithError("sendto() sent a different number of bytes than expected");
 	
 		/* Recv a response */
 		fromSize = sizeof(fromAddr);
-		if ((respStringLen = recvfrom(sock, echoBuffer, BUFFERMAX, 0, (struct sockaddr *) &fromAddr, &fromSize)) != nomeArquivoLen)
+		if ((respStringLen = recvfrom(sock, echoBuffer, BUFFERMAX, 0, (struct sockaddr *) &fromAddr, &fromSize)) != arqProp.tamanhoNome)
 			DieWithError("recvfrom() failed");
 	
 		if (servAddr.sin_addr.s_addr != fromAddr.sin_addr.s_addr)
@@ -146,16 +136,16 @@ int main(int argc, char *argv[])
 	fclose(arquivo);
 	
 	/* Envia sinalizacao do fim da tranferencia do arquivo para o servidor */
-	nomeArquivo = "fim";
-	nomeArquivoLen = strlen(nomeArquivo);
-	if (sendto(sock, nomeArquivo, nomeArquivoLen, 0, (struct sockaddr *)
-					 &servAddr, sizeof(servAddr)) != nomeArquivoLen)
+	strcpy(arqProp.nome,"fim");
+	arqProp.tamanhoNome = strlen(arqProp.nome);
+	if (sendto(sock, arqProp.nome, arqProp.tamanhoNome, 0, (struct sockaddr *)
+					 &servAddr, sizeof(servAddr)) != arqProp.tamanhoNome)
 		DieWithError("sendto() sent a different number of bytes than expected");
 	
 	/* Recv a response */
 	fromSize = sizeof(fromAddr);
 	if ((respStringLen = recvfrom(sock, echoBuffer, BUFFERMAX, 0, 
-		 (struct sockaddr *) &fromAddr, &fromSize)) != nomeArquivoLen)
+		 (struct sockaddr *) &fromAddr, &fromSize)) != arqProp.tamanhoNome)
 		DieWithError("recvfrom() failed");
 	
 	if (servAddr.sin_addr.s_addr != fromAddr.sin_addr.s_addr)
