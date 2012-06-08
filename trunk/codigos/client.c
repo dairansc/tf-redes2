@@ -93,20 +93,19 @@ int main(int argc, char *argv[])
     printf("%s\n",teste->nome);
 	
 	
-    // Envia cabeçalho do arquivo para o servidor
-    if (sendto(sock, buffer, BUFFERMAX, 0, (struct sockaddr *) &servAddr, sizeof(servAddr)) != arqProp.tamanhoNome)
+	// Envia cabeçalho do arquivo para o servidor
+    if (sendto(sock, buffer, BUFFERMAX, 0, (struct sockaddr *) &servAddr, sizeof(servAddr)) != BUFFERMAX)
       DieWithError("sendto() sent a different number of bytes than expected");
 	
-	exit(1);
-	/* Recv a response */
+	// Recebe resposta
 	fromSize = sizeof(fromAddr);
 	if ((respStringLen = recvfrom(sock, echoBuffer, BUFFERMAX, 0, (struct sockaddr *) &fromAddr, &fromSize)) != arqProp.tamanhoNome)
 		DieWithError("recvfrom() failed");
 	
 	if (servAddr.sin_addr.s_addr != fromAddr.sin_addr.s_addr)
 	{
-			fprintf(stderr,"Error: received a packet from unknown source.\n");
-			exit(1);
+        fprintf(stderr,"Error: received a packet from unknown source.\n");
+        exit(1);
 	}
 	
 	/* Transfere conteudo do arquivo para servidor */
