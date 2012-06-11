@@ -9,12 +9,13 @@ int file_exists(const char *filename)
   FILE *arquivo;
   int tam = strlen(filename);
 
-  if ((arquivo = fopen(filename, "r")) != NULL)
+  if ((arquivo = fopen(filename, "rb")) != NULL)
   {
     printf("file exist %s %d\n",filename,tam);
     fclose(arquivo);
     return 1;
   }
+
   return 0;
 }
 
@@ -47,6 +48,7 @@ int main(int argc, char *argv[])
     char nome_arquivo[BUFFERMAX];        /* Buffer for echo string */
     int id_nome , iniciaComunicacao = 0, janela;
     long int sequencia;
+    char nome_teste[10] = "teste";
 
     if (argc > 2)    // Testa pelo número correto de argumentos
     {
@@ -102,7 +104,7 @@ int main(int argc, char *argv[])
             dataToClient.janela = TAMJANELA;
             memset(dataToClient.dados, 0, TAMDADOSMAX);
 
-            if((Arquivo = fopen(nome_arquivo,"wb")) == NULL)
+            if((arqDestino = fopen(nome_arquivo,"wb")) == NULL)
             {
                 dataToClient.flags = FIM;
                 strcpy(dataToClient.dados, "Erro ao abrir o arquivo");
@@ -116,7 +118,7 @@ int main(int argc, char *argv[])
             else
             {
                 dataToClient.flags = SYN;
-
+                /* Envia um datagrama de volta para o cliente confirmando inicio da comunicacao*/
                 enviaPacote(Sock,clntAddr,dataToClient);
 
                 iniciaComunicacao = 1;
@@ -137,16 +139,16 @@ int main(int argc, char *argv[])
                     dataFromClient = recebePacote(Sock,&clntAddr,servAddr,1);
                     if((dataFromClient->flags & FIM) == FIM)
                     {
-                        fclose(Arquivo);
+                        fclose(arqDestino);
                         iniciaComunicacao = 0;
-                         printf("Fim da transmissao.\n");
+                        printf("Fim da transmissao.\n");
                     }
                     else if(!Reenviar)
                     {
                         memcpy((BufferJanela+(TAMDADOSMAX*ContJanela)), dataFromClient->dados, TAMDADOSMAX);
 
                         Reenviar = (sequencia != dataFromClient->sequencia - 1) ? 1 : 0;
-                        printf("Reenviando sequencia %d.\n",Reenviar);
+                        printf("Verificando sequencia atual %li com sequencia recebida %li.\n",sequencia,dataFromClient->sequencia-1);
                     }
                     sequencia = dataFromClient->sequencia;
                 }
@@ -154,7 +156,27 @@ int main(int argc, char *argv[])
                 if(!Reenviar)
                 {
                     janela = dataFromClient->janela;
-                    fwrite(&BufferJanela, (TAMDADOSMAX * janela), 1, Arquivo);
+                    printf("Realiza transferência para o arquivo\n");
+                   // fwrite(&BufferJanela, (TAMDADOSMAX * janela), 1, arqDestino);
+                   // fwrite(&BufferJanela, sizeof(BufferJanela), 1, arqDestino);
+                    
+                    /*
+                    memset(TempBufferJanela, 0, sizeof(TempBufferJanela));
+                   
+                    for(ContJanela=0; ContJanela<janela; ContJanela++) {
+                        memcpy(TempBufferJanela, (BufferJanela+(TAMDADOSMAX*ContJanela)), TAMDADOSMAX);
+                        printf("Copiou %d.\n",sizeof(TempBufferJanela));
+                        fwrite(&TempBufferJanela, sizeof(TempBufferJanela), 1, arqDestino);
+                        printf("Gravou no arquivo %s.\n",TempBufferJanela);
+                    }
+                    */ 
+
+                    for(ContJanela=0; ContJanela<(TAMDADOSMAX*TAMJANELA); ContJanela++) {
+                        printf("Copiou %d.\n",sizeof(TempBufferJanela));
+                        fwrite(&BufferJanela[ContJanela], sizeof(BufferJanela[ContJanela]), 1, arqDestino);
+                        printf("Gravou no arquivo %s.\n",TempBufferJanela);
+                    }
+                     
                     printf("Desliza janela para %d.\n",janela);
                 }
                 else
