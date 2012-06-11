@@ -1,10 +1,3 @@
-#include <stdio.h>      /* for printf() and fprintf() */
-#include <sys/socket.h> /* for socket() and bind() */
-#include <arpa/inet.h>  /* for sockaddr_in and inet_ntoa() */
-#include <stdlib.h>     /* for atoi() and exit() */
-#include <string.h>     /* for memset() */
-#include <unistd.h>     /* for close() */
-#include "DieWithError.c"
 #include "biblioteca.c"
 
 void DieWithError(char *errorMessage);  /* External error handling function */
@@ -85,9 +78,7 @@ int main(int argc, char *argv[])
             /* Bloqueado até que receba a mensagem do cliente */
 
             printf("Antes de chamar o Recebe pacotes iniciaComunicacao == 0.\n");
-            printf("antes Handling client %s\n", inet_ntoa(clntAddr.sin_addr));
-            dataFromClient = recebePacote(Sock,&clntAddr,0);
-            printf("Depois de chamar o Recebe pacotes iniciaComunicacao == 0.\n");
+            dataFromClient = recebePacote(Sock,&clntAddr,servAddr,0);
             janela = dataFromClient->janela;
             sequencia = dataFromClient->sequencia;
             arqProp = (struct fileHeader *)dataFromClient->dados;
@@ -143,19 +134,19 @@ int main(int argc, char *argv[])
                 {
                     //dataToServer.flags = ACK;
                     //dataToServer.sequencia++;
-                    printf("Antes de chamar o Recebe pacotes iniciaComunicacao == 1.\n");
-                    dataFromClient = recebePacote(Sock,&clntAddr,1);
-                    printf("Depois de chamar o Recebe pacotes iniciaComunicacao == 1.\n");
+                    dataFromClient = recebePacote(Sock,&clntAddr,servAddr,1);
                     if((dataFromClient->flags & FIM) == FIM)
                     {
                         fclose(Arquivo);
                         iniciaComunicacao = 0;
+                         printf("Fim da transmissao.\n");
                     }
                     else if(!Reenviar)
                     {
                         memcpy((BufferJanela+(TAMDADOSMAX*ContJanela)), dataFromClient->dados, TAMDADOSMAX);
 
                         Reenviar = (sequencia != dataFromClient->sequencia - 1) ? 1 : 0;
+                        printf("Reenviando sequencia %d.\n",Reenviar);
                     }
                     sequencia = dataFromClient->sequencia;
                 }
@@ -164,10 +155,12 @@ int main(int argc, char *argv[])
                 {
                     janela = dataFromClient->janela;
                     fwrite(&BufferJanela, (TAMDADOSMAX * janela), 1, Arquivo);
+                    printf("Desliza janela para %d.\n",janela);
                 }
                 else
                 {
                     dataToClient.flags = NACK;
+                    printf("Envio de NACK.\n",janela);
                     enviaPacote(Sock,clntAddr,dataToClient);
                 }
             }
