@@ -1,3 +1,11 @@
+#include <stdio.h>      /* for printf() and fprintf() */
+#include <sys/socket.h> /* for socket() and bind() */
+#include <arpa/inet.h>  /* for sockaddr_in and inet_ntoa() */
+#include <stdlib.h>     /* for atoi() and exit() */
+#include <string.h>     /* for memset() */
+#include <unistd.h>     /* for close() */
+#include "DieWithError.c"
+
 #define BUFFERMAX 1500
 #define PORTAPADRAO 10000
 
@@ -63,30 +71,31 @@ void enviaPacote(int Sock, struct sockaddr_in Addr, struct datagramHeader pacote
     printf("enviou pacotes sem erro.\n");
 }
 
-struct datagramHeader *recebePacote(int Sock, struct sockaddr_in *Addr, short verificarOrigem)
+struct datagramHeader *recebePacote(int Sock, struct sockaddr_in *fromAddr, struct sockaddr_in sourceAddr, short verificarOrigem)
 {
     char buffer[BUFFERMAX];
-    unsigned int fromSize = sizeof(Addr);
+   
+    struct sockaddr_in tempFromAddr;
+    unsigned int fromSize = sizeof(tempFromAddr);
+    
     struct datagramHeader* recPacote = (struct datagramHeader*)malloc(sizeof(struct datagramHeader));
 
     memset(buffer, 0, sizeof(buffer));
 
     // Recebe resposta
     memset(buffer, 0, sizeof(buffer));
-    if ((recvfrom(Sock, buffer, BUFFERMAX, 0, (struct sockaddr *) &Addr, &fromSize)) != BUFFERMAX)
+    if ((recvfrom(Sock, buffer, BUFFERMAX, 0, (struct sockaddr *) &tempFromAddr, &fromSize)) != BUFFERMAX)
         DieWithError("recvfrom() failed");
     
-   // printf("recebePacote Handling client %s\n", inet_ntoa(Addr->sin_addr));
-    
-/*   if (verificarOrigem && ToAddr.sin_addr.s_addr != FromAddr.sin_addr.s_addr)
+    *fromAddr = tempFromAddr;
+/*    
+    if (verificarOrigem && sourceAddr.sin_addr.s_addr != tempFromAddr.sin_addr.s_addr)
     {
         fprintf(stderr,"Error: received a packet from unknown source.\n");
         exit(1);
     }
 */
-    printf("Recebe pacotes, antes memcpy.\n");
     memcpy(recPacote, buffer, sizeof(buffer));
-    printf("Recebe pacotes, depois memcpy.\n");
 
     return recPacote;
 

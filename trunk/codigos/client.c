@@ -1,10 +1,3 @@
-#include <stdio.h>      /* for printf() and fprintf() */
-#include <sys/socket.h> /* for socket(), connect(), sendto(), and recvfrom() */
-#include <arpa/inet.h>  /* for sockaddr_in and inet_addr() */
-#include <stdlib.h>     /* for atoi() and exit() */
-#include <string.h>     /* for memset() */
-#include <unistd.h>     /* for close() */
-#include "DieWithError.c"
 #include "biblioteca.c"
 
 void DieWithError(char *errorMessage);  /* External error handling function */
@@ -81,7 +74,7 @@ int main(int argc, char *argv[])
     // Envia cabeçalho do arquivo para o servidor
     enviaPacote(Sock,servAddr,dataToServer);
 
-    dataFromServer = recebePacote(Sock,&fromAddr,1);
+    dataFromServer = recebePacote(Sock,&fromAddr,servAddr,1);
 
     if((dataFromServer->flags & SYN) != SYN)
     {
@@ -114,8 +107,9 @@ int main(int argc, char *argv[])
             }
 
             // Depois de enviar toda a janela, recebe uma resposta
-            dataFromServer = recebePacote(Sock,&fromAddr,1);
+            dataFromServer = recebePacote(Sock,&fromAddr,servAddr,1);
             Reenviar = ((dataFromServer->flags & ACK) != ACK) ? 1 : 0;
+            printf("Resposta do servidor se é para reenviar = %d\n",Reenviar);
         }
 
         // Ajusta tamanho da última janela
