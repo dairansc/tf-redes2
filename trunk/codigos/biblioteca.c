@@ -11,8 +11,6 @@
 #define ACK   0x04
 #define NACK  0x08
 
-
-
 struct fileHeader
 {
     long int tamanho;
@@ -29,9 +27,6 @@ struct datagramHeader
 };
 
 
-int Sock; // descritor de Socket
-struct sockaddr_in ToAddr; // Endereço destino
-struct sockaddr_in FromAddr; // Endereço origem
 unsigned short Porta;     // Porta aberta de conexão
 FILE *Arquivo;              // Ponteiro para o arquivo
 short Reenviar;             // Indica se janela precisa ser reenviada
@@ -51,40 +46,49 @@ void configuraPorta(char *parametro)
     }
 }
 
-void enviaPacote(struct datagramHeader pacote)
+void enviaPacote(int Sock, struct sockaddr_in Addr, struct datagramHeader pacote)
 {
     char buffer[BUFFERMAX];
 
     printf("%d\n\n", pacote.janela);
 
     memset(buffer, 0, sizeof(buffer));
-    memcpy(buffer, &(pacote), sizeof(struct datagramHeader));
+    memcpy(buffer, &(pacote), sizeof(pacote));
 
-    if (sendto(Sock, buffer, BUFFERMAX, 0, (struct sockaddr *) &ToAddr, sizeof(ToAddr)) != BUFFERMAX)
-        DieWithError("sendto() sent a different number of bytes than expected");
+    printf("envia pacotes.\n");
 
+    if (sendto(Sock, buffer, BUFFERMAX, 0, (struct sockaddr *) &Addr, sizeof(Addr)) != BUFFERMAX)
+        DieWithError("Error: sendto() sent a different number of bytes than expected");
+
+    printf("enviou pacotes sem erro.\n");
 }
 
-struct datagramHeader *recebePacote(short verificarOrigem)
+struct datagramHeader *recebePacote(int Sock, struct sockaddr_in *Addr, short verificarOrigem)
 {
     char buffer[BUFFERMAX];
-    unsigned int fromSize = sizeof(FromAddr);
+    unsigned int fromSize = sizeof(Addr);
+    struct datagramHeader* recPacote = (struct datagramHeader*)malloc(sizeof(struct datagramHeader));
 
     memset(buffer, 0, sizeof(buffer));
 
     // Recebe resposta
     memset(buffer, 0, sizeof(buffer));
-    if ((recvfrom(Sock, buffer, BUFFERMAX, 0, (struct sockaddr *) &FromAddr, &fromSize)) != BUFFERMAX)
+    if ((recvfrom(Sock, buffer, BUFFERMAX, 0, (struct sockaddr *) &Addr, &fromSize)) != BUFFERMAX)
         DieWithError("recvfrom() failed");
-
-
-    if (verificarOrigem && ToAddr.sin_addr.s_addr != FromAddr.sin_addr.s_addr)
+    
+   // printf("recebePacote Handling client %s\n", inet_ntoa(Addr->sin_addr));
+    
+/*   if (verificarOrigem && ToAddr.sin_addr.s_addr != FromAddr.sin_addr.s_addr)
     {
         fprintf(stderr,"Error: received a packet from unknown source.\n");
         exit(1);
     }
+*/
+    printf("Recebe pacotes, antes memcpy.\n");
+    memcpy(recPacote, buffer, sizeof(buffer));
+    printf("Recebe pacotes, depois memcpy.\n");
 
-    return (struct datagramHeader *)buffer;
+    return recPacote;
 
 }
 
