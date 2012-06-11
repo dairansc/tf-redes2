@@ -43,9 +43,13 @@ void altera_nome_arquivo (char nome_antigo[BUFFERMAX], int id_nome, char *nome_n
 
 int main(int argc, char *argv[])
 {
+    int Sock; // descritor de Socket
+    struct sockaddr_in servAddr; // Endereço destino
+    struct sockaddr_in clntAddr; // Endereço origem
+    
     struct fileHeader *arqProp;
     struct datagramHeader dataToClient;
-    struct datagramHeader *dataFromClient;
+    struct datagramHeader *dataFromClient = (struct datagramHeader*)malloc(sizeof(struct datagramHeader));
 
     char nome_arquivo[BUFFERMAX];        /* Buffer for echo string */
     int id_nome , iniciaComunicacao = 0, janela;
@@ -57,20 +61,21 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
+    printf("porta %d\n",Porta);
     configuraPorta(argv[1]);// Testa se a porta do servidor está válida
-
+    printf("porta %d\n",Porta);
     // Cria socket para enviar/receber datagramas
     if ((Sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0)
         DieWithError("socket() failed");
 
     // Constrói a estrutura de endereço local
-    memset(&FromAddr, 0, sizeof(FromAddr));   /* Zero out structure */
-    FromAddr.sin_family = AF_INET;                /* Internet address family */
-    FromAddr.sin_addr.s_addr = htonl(INADDR_ANY); /* Any incoming interface */
-    FromAddr.sin_port = htons(Porta);      /* Local port */
+    memset(&servAddr, 0, sizeof(servAddr));   /* Zero out structure */
+    servAddr.sin_family = AF_INET;                /* Internet address family */
+    servAddr.sin_addr.s_addr = htonl(INADDR_ANY); /* Any incoming interface */
+    servAddr.sin_port = htons(Porta);      /* Local port */
 
     /* Bind to the local address */
-    if (bind(Sock, (struct sockaddr *) &FromAddr, sizeof(FromAddr)) < 0)
+    if (bind(Sock, (struct sockaddr *) &servAddr, sizeof(servAddr)) < 0)
         DieWithError("bind() failed");
 
     for (;;) /* Run forever */
@@ -78,12 +83,16 @@ int main(int argc, char *argv[])
         if (iniciaComunicacao == 0)
         {
             /* Bloqueado até que receba a mensagem do cliente */
-            dataFromClient = recebePacote(0);
+
+            printf("Antes de chamar o Recebe pacotes iniciaComunicacao == 0.\n");
+            printf("antes Handling client %s\n", inet_ntoa(clntAddr.sin_addr));
+            dataFromClient = recebePacote(Sock,&clntAddr,0);
+            printf("Depois de chamar o Recebe pacotes iniciaComunicacao == 0.\n");
             janela = dataFromClient->janela;
             sequencia = dataFromClient->sequencia;
             arqProp = (struct fileHeader *)dataFromClient->dados;
 
-            printf("Handling client %s\n", inet_ntoa(ToAddr.sin_addr));
+            printf("Handling client %s\n", inet_ntoa(clntAddr.sin_addr));
             printf("Received: %s\n", arqProp->nome);
 
 
@@ -110,14 +119,14 @@ int main(int argc, char *argv[])
                 printf("%s cópia %s\n", dataToClient.dados, nome_arquivo);
 
                 /* Envia um datagrama de volta para o cliente informando erro*/
-                enviaPacote(dataToClient);
+                enviaPacote(Sock,clntAddr,dataToClient);
                 //exit(1);
             }
             else
             {
                 dataToClient.flags = SYN;
 
-                enviaPacote(dataToClient);
+                enviaPacote(Sock,clntAddr,dataToClient);
 
                 iniciaComunicacao = 1;
             }
@@ -134,8 +143,9 @@ int main(int argc, char *argv[])
                 {
                     //dataToServer.flags = ACK;
                     //dataToServer.sequencia++;
-                    dataFromClient = recebePacote(1);
-
+                    printf("Antes de chamar o Recebe pacotes iniciaComunicacao == 1.\n");
+                    dataFromClient = recebePacote(Sock,&clntAddr,1);
+                    printf("Depois de chamar o Recebe pacotes iniciaComunicacao == 1.\n");
                     if((dataFromClient->flags & FIM) == FIM)
                     {
                         fclose(Arquivo);
@@ -158,7 +168,7 @@ int main(int argc, char *argv[])
                 else
                 {
                     dataToClient.flags = NACK;
-                    enviaPacote(dataToClient);
+                    enviaPacote(Sock,clntAddr,dataToClient);
                 }
             }
         }

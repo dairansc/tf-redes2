@@ -11,9 +11,13 @@ void DieWithError(char *errorMessage);  /* External error handling function */
 
 int main(int argc, char *argv[])
 {
+    int Sock; // descritor de Socket
+    struct sockaddr_in servAddr; // Endereço destino
+    struct sockaddr_in fromAddr; // Endereço origem
+
     struct fileHeader arqProp;
     struct datagramHeader dataToServer;
-    struct datagramHeader *dataFromServer;
+    struct datagramHeader *dataFromServer = (struct datagramHeader*)malloc(sizeof(struct datagramHeader));
 
     char *servIP;                    // Endereço IP do servidor
     char *nomeArquivo;                // String com o nome do arquivo
@@ -60,10 +64,10 @@ int main(int argc, char *argv[])
         DieWithError("socket() failed");
 
     // Constrói a estrutura do endereço destino
-    memset(&ToAddr, 0, sizeof(ToAddr));       // Zera a estrutura
-    ToAddr.sin_family = AF_INET;               // Internet addr family
-    ToAddr.sin_addr.s_addr = inet_addr(servIP);// Endereço de IP do servidor
-    ToAddr.sin_port   = htons(Porta);          // Porta do servidor
+    memset(&servAddr, 0, sizeof(servAddr));       // Zera a estrutura
+    servAddr.sin_family = AF_INET;               // Internet addr family
+    servAddr.sin_addr.s_addr = inet_addr(servIP);// Endereço de IP do servidor
+    servAddr.sin_port   = htons(Porta);          // Porta do servidor
 
     // Limpa dados do datagrama
     memset(dataToServer.dados, 0, TAMDADOSMAX);
@@ -75,9 +79,9 @@ int main(int argc, char *argv[])
     memcpy(dataToServer.dados, &(arqProp), sizeof(struct fileHeader));
 
     // Envia cabeçalho do arquivo para o servidor
-    enviaPacote(dataToServer);
+    enviaPacote(Sock,servAddr,dataToServer);
 
-    dataFromServer = recebePacote(1);
+    dataFromServer = recebePacote(Sock,&fromAddr,1);
 
     if((dataFromServer->flags & SYN) != SYN)
     {
@@ -105,12 +109,12 @@ int main(int argc, char *argv[])
                 memcpy(&(dataToServer.dados), (BufferJanela+(TAMDADOSMAX*ContJanela)), TAMDADOSMAX);
 
                 // Envia conteudo do arquivo para o servidor
-                printf("%s",dataToServer.dados);
-                enviaPacote(dataToServer);
+                printf("Conteúdo do arquivo %s\n",dataToServer.dados);
+                enviaPacote(Sock,servAddr,dataToServer);
             }
 
             // Depois de enviar toda a janela, recebe uma resposta
-            dataFromServer = recebePacote(1);
+            dataFromServer = recebePacote(Sock,&fromAddr,1);
             Reenviar = ((dataFromServer->flags & ACK) != ACK) ? 1 : 0;
         }
 
@@ -126,7 +130,7 @@ int main(int argc, char *argv[])
     dataToServer.flags = FIM;
     dataToServer.sequencia = 0;
 
-    enviaPacote(dataToServer);
+    enviaPacote(Sock,servAddr,dataToServer);
 
     close(Sock);
 
