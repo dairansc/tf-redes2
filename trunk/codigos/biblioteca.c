@@ -36,9 +36,10 @@ struct datagramHeader
 
 
 unsigned short Porta;     // Porta aberta de conexão
-FILE *Arquivo;              // Ponteiro para o arquivo
+FILE *arqOrigem, *arqDestino;              // Ponteiro para o arquivo
 short Reenviar;             // Indica se janela precisa ser reenviada
 char BufferJanela[TAMDADOSMAX*TAMJANELA];
+char TempBufferJanela[TAMDADOSMAX];
 int ContJanela;
 
 void configuraPorta(char *parametro)

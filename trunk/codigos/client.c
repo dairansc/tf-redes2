@@ -29,15 +29,15 @@ int main(int argc, char *argv[])
     configuraPorta(argv[3]);// Terceiro argumento: Testa se a porta do servidor está válida
 
 
-    if((Arquivo = fopen(nomeArquivo, "rb")) == NULL)
+    if((arqOrigem = fopen(nomeArquivo, "rb")) == NULL)
     {
         fprintf(stderr, "Erro ao abrir o arquivo original %s\n", arqProp.nome);
         exit(1);
     }
 
-    fseek(Arquivo, 0, SEEK_END); // posiciona ponteiro no final do arquivo
-    arqProp.tamanho = ftell(Arquivo);   // pega o valor corrente do ponteiro
-    fseek(Arquivo, 0, SEEK_SET); // posiciona de volta no início do arquivo
+    fseek(arqOrigem, 0, SEEK_END); // posiciona ponteiro no final do arquivo
+    arqProp.tamanho = ftell(arqOrigem);   // pega o valor corrente do ponteiro
+    fseek(arqOrigem, 0, SEEK_SET); // posiciona de volta no início do arquivo
 
     nomeArquivo = nomeBaseArquivo(nomeArquivo);
 
@@ -87,10 +87,10 @@ int main(int argc, char *argv[])
 
 
     // Transfere conteudo do arquivo para servidor
-    while(!feof(Arquivo))
+    while(!feof(arqOrigem))
     {
         memset(BufferJanela, 0, sizeof(BufferJanela));
-        fread(&BufferJanela, (TAMDADOSMAX * dataToServer.janela), 1, Arquivo);
+        fread(&BufferJanela, (TAMDADOSMAX * dataToServer.janela), 1, arqOrigem);
 
         Reenviar = 1;
         while(Reenviar)
@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
                                (arqProp.tamanho-TAMDADOSMAX*dataToServer.sequencia)/TAMDADOSMAX + 1;
     }
 
-    fclose(Arquivo);
+    fclose(arqOrigem);
 
     /* Envia sinalizacao do fim da tranferencia do arquivo para o servidor */
     dataToServer.flags = FIM;
