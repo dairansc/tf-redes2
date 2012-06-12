@@ -90,8 +90,10 @@ int main(int argc, char *argv[])
     while(!feof(arqOrigem))
     {
         memset(BufferJanela, 0, sizeof(BufferJanela));
-        fread(&BufferJanela, (TAMDADOSMAX * dataToServer.janela), 1, arqOrigem);
-
+        fread(&BufferJanela, 1, (TAMDADOSMAX * dataToServer.janela), arqOrigem);
+        
+        printf("Conteúdo do bufferJanela %s\n",BufferJanela);
+        
         Reenviar = 1;
         while(Reenviar)
         {
@@ -102,7 +104,7 @@ int main(int argc, char *argv[])
                 memcpy(&(dataToServer.dados), (BufferJanela+(TAMDADOSMAX*ContJanela)), TAMDADOSMAX);
 
                 // Envia conteudo do arquivo para o servidor
-                printf("Conteúdo do arquivo %s\n",dataToServer.dados);
+                printf("Conteúdo dos dados a serem enviados %s\n",dataToServer.dados);
                 enviaPacote(Sock,servAddr,dataToServer);
             }
 

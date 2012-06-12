@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
     struct datagramHeader dataToClient;
     struct datagramHeader *dataFromClient = (struct datagramHeader*)malloc(sizeof(struct datagramHeader));
 
-    char nome_arquivo[BUFFERMAX];        /* Buffer for echo string */
+    char nome_arquivo[BUFFERMAX];
     int id_nome , iniciaComunicacao = 0, janela;
     long int sequencia;
     char nome_teste[10] = "teste";
@@ -146,13 +146,13 @@ int main(int argc, char *argv[])
                     else if(!Reenviar)
                     {
                         memcpy((BufferJanela+(TAMDADOSMAX*ContJanela)), dataFromClient->dados, TAMDADOSMAX);
-
+                        
                         Reenviar = (sequencia != dataFromClient->sequencia - 1) ? 1 : 0;
-                        printf("Verificando sequencia atual %li com sequencia recebida %li.\n",sequencia,dataFromClient->sequencia-1);
+                        printf("Verificando sequencia atual %li com sequencia recebida %li. Tamanho do Buffer de Janela: %d\n",sequencia,dataFromClient->sequencia-1, TAMDADOSMAX*ContJanela);
                     }
                     sequencia = dataFromClient->sequencia;
                 }
-
+				printf("%s\n\n", BufferJanela);
                 if(!Reenviar)
                 {
                     janela = dataFromClient->janela;
@@ -171,13 +171,13 @@ int main(int argc, char *argv[])
                     }
                     */ 
 
-                    for(ContJanela=0; ContJanela<(TAMDADOSMAX*TAMJANELA); ContJanela++) {
-                        printf("Copiou %d.\n",sizeof(TempBufferJanela));
-                        fwrite(&BufferJanela[ContJanela], sizeof(BufferJanela[ContJanela]), 1, arqDestino);
-                        printf("Gravou no arquivo %s.\n",TempBufferJanela);
-                    }
+                    //for(ContJanela=0; ContJanela<(TAMDADOSMAX*TAMJANELA); ContJanela++) {
+                    //    printf("Copiou %d.\n",sizeof(TempBufferJanela));
+                        fwrite(&BufferJanela, 1, sizeof(BufferJanela), arqDestino);
+                    //    printf("Gravou no arquivo %s.\n",TempBufferJanela);
+                    //}
                      
-                    printf("Desliza janela para %d.\n",janela);
+                    //printf("Desliza janela para %d.\n",janela);
                 }
                 else
                 {

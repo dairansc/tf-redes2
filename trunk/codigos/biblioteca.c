@@ -9,8 +9,8 @@
 #define BUFFERMAX 1500
 #define PORTAPADRAO 10000
 
-#define TAMDADOSMAX BUFFERMAX-sizeof(short)-sizeof(long int)-sizeof(long int)-sizeof(int)
-#define NOMEARQUIVOMAX TAMDADOSMAX-sizeof(long int)
+#define TAMDADOSMAX (BUFFERMAX-sizeof(short)-sizeof(long int)-sizeof(long int)-sizeof(int))
+#define NOMEARQUIVOMAX (TAMDADOSMAX-sizeof(long int))
 #define TAMJANELA 10
 
 // indicadores de conexão
