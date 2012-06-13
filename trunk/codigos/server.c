@@ -1,9 +1,9 @@
 #include "biblioteca.c"
 
-void DieWithError(char *errorMessage);  /* External error handling function */
+void DieWithError(char *errorMessage);  // External error handling function
 
-/*Se o arquivo existir o valor 1 (true) será retornado. Caso
-  contrário a função retornará 0 (false). */
+// Se o arquivo existir o valor 1 (true) será retornado. Caso
+// contrário a função retornará 0 (false).
 int file_exists(const char *filename)
 {
   FILE *arquivo;
@@ -19,7 +19,7 @@ int file_exists(const char *filename)
   return 0;
 }
 
-/*Alterar nome do arquivo, em caso de teste em localhost. */
+// Alterar nome do arquivo, em caso de teste em localhost.
 void altera_nome_arquivo (char nome_antigo[BUFFERMAX], int id_nome, char *nome_novo)
 {
     int tam = strlen(nome_antigo);
@@ -66,20 +66,20 @@ int main(int argc, char *argv[])
         DieWithError("socket() failed");
 
     // Constrói a estrutura de endereço local
-    memset(&servAddr, 0, sizeof(servAddr));   /* Zero out structure */
-    servAddr.sin_family = AF_INET;                /* Internet address family */
-    servAddr.sin_addr.s_addr = htonl(INADDR_ANY); /* Any incoming interface */
-    servAddr.sin_port = htons(Porta);      /* Local port */
+    memset(&servAddr, 0, sizeof(servAddr));   // Zero out structure
+    servAddr.sin_family = AF_INET;                // Internet address family
+    servAddr.sin_addr.s_addr = htonl(INADDR_ANY); // Any incoming interface
+    servAddr.sin_port = htons(Porta);      // Local port
 
-    /* Bind to the local address */
+    // Bind to the local address
     if (bind(Sock, (struct sockaddr *) &servAddr, sizeof(servAddr)) < 0)
         DieWithError("bind() failed");
 
-    for (;;) /* Run forever */
+    for (;;) // Run forever
     {
         if (iniciaComunicacao == 0)
         {
-            /* Bloqueado até que receba a mensagem do cliente */
+            // Bloqueado até que receba a mensagem do cliente
 
             printf("Antes de chamar o Recebe pacotes iniciaComunicacao == 0.\n");
             dataFromClient = recebePacote(Sock,&clntAddr,servAddr,0);
@@ -113,14 +113,14 @@ int main(int argc, char *argv[])
 
                 printf("%s cópia %s\n", dataToClient.dados, nome_arquivo);
 
-                /* Envia um datagrama de volta para o cliente informando erro*/
+                // Envia um datagrama de volta para o cliente informando erro
                 enviaPacote(Sock,clntAddr,dataToClient);
                 //exit(1);
             }
             else
             {
                 dataToClient.flags = SYN;
-                /* Envia um datagrama de volta para o cliente confirmando inicio da comunicacao*/
+                // Envia um datagrama de volta para o cliente confirmando inicio da comunicacao
                 enviaPacote(Sock,clntAddr,dataToClient);
 
                 iniciaComunicacao = 1;
@@ -198,5 +198,4 @@ int main(int argc, char *argv[])
             exit(1);
         }
     }
-    /* NOT REACHED */
 }
