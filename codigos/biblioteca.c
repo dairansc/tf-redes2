@@ -1,12 +1,12 @@
 // comando rápido para compilação e execução do servidor
 // gcc -fno-stack-protector -o server server.c && gcc -fno-stack-protector -o client client.c && ./server 10000
 
-#include <stdio.h>      /* for printf() and fprintf() */
-#include <sys/socket.h> /* for socket() and bind() */
-#include <arpa/inet.h>  /* for sockaddr_in and inet_ntoa() */
-#include <stdlib.h>     /* for atoi() and exit() */
-#include <string.h>     /* for memset() */
-#include <unistd.h>     /* for close() */
+#include <stdio.h>      // for printf() and fprintf()
+#include <sys/socket.h> // for socket() and bind()
+#include <arpa/inet.h>  // for sockaddr_in and inet_ntoa()
+#include <stdlib.h>     // for atoi() and exit()
+#include <string.h>     // for memset()
+#include <unistd.h>     // for close()
 #include "DieWithError.c"
 
 #define BUFFERMAX 1500

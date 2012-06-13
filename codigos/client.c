@@ -1,6 +1,6 @@
 #include "biblioteca.c"
 
-void DieWithError(char *errorMessage);  /* External error handling function */
+void DieWithError(char *errorMessage);  // External error handling function
 
 int main(int argc, char *argv[])
 {
@@ -122,7 +122,7 @@ int main(int argc, char *argv[])
 
     fclose(arqOrigem);
 
-    /* Envia sinalizacao do fim da tranferencia do arquivo para o servidor */
+    // Envia sinalizacao do fim da tranferencia do arquivo para o servidor
     dataToServer.flags = FIM;
     dataToServer.sequencia = 0;
 
