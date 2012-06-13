@@ -50,6 +50,8 @@ int main(int argc, char *argv[])
     long int sequencia;
     char nome_teste[10] = "teste";
 
+	int i;
+
     if (argc > 2)    // Testa pelo número correto de argumentos
     {
         fprintf(stderr,"Uso: %s [<Porta a ser aberta>]\nPorta padrão: %d\n", argv[0], PORTAPADRAO);
@@ -152,7 +154,11 @@ int main(int argc, char *argv[])
                     }
                     sequencia = dataFromClient->sequencia;
                 }
-				printf("%s\n\n", BufferJanela);
+				for(i=0; i<TAMDADOSMAX*8; i++)
+                {
+					printf("%c", BufferJanela[i]);
+				}
+					
                 if(!Reenviar)
                 {
                     janela = dataFromClient->janela;

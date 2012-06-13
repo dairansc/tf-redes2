@@ -91,9 +91,9 @@ int main(int argc, char *argv[])
     {
         memset(BufferJanela, 0, sizeof(BufferJanela));
         fread(&BufferJanela, 1, (TAMDADOSMAX * dataToServer.janela), arqOrigem);
-        
+
         printf("Conteúdo do bufferJanela %s\n",BufferJanela);
-        
+
         Reenviar = 1;
         while(Reenviar)
         {
@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
             {
                 dataToServer.flags = ACK;
                 dataToServer.sequencia++;
-                memcpy(&(dataToServer.dados), (BufferJanela+(TAMDADOSMAX*ContJanela)), TAMDADOSMAX);
+                memcpy(&(dataToServer.dados), (BufferJanela+TAMDADOSMAX*ContJanela), TAMDADOSMAX);
 
                 // Envia conteudo do arquivo para o servidor
                 printf("Conteúdo dos dados a serem enviados %s\n",dataToServer.dados);
