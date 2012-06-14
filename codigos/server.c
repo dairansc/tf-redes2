@@ -51,7 +51,8 @@ int main(int argc, char *argv[])
     char nome_teste[10] = "teste";
     char dados[TAMDADOSMAX];
 
-	int i, qntRecebida, qntGravar;
+	int i, qntRecebida;
+	long int qntGravar;
 
     if (argc > 2)    // Testa pelo número correto de argumentos
     {
@@ -183,7 +184,7 @@ int main(int argc, char *argv[])
 					
                 if(!Reenviar)
                 {
-                    janela = dataFromClient->janela;
+                    
                     printf("Realiza transferência para o arquivo\n");
                    // fwrite(&BufferJanela, (TAMDADOSMAX * janela), 1, arqDestino);
                    // fwrite(&BufferJanela, sizeof(BufferJanela), 1, arqDestino);
@@ -201,11 +202,13 @@ int main(int argc, char *argv[])
 
                     //for(ContJanela=0; ContJanela<(TAMDADOSMAX*TAMJANELA); ContJanela++) {
                     //    printf("Copiou %d.\n",sizeof(TempBufferJanela));
-                    qntGravar = (sequencia*TAMDADOSMAX+TAMDADOSMAX > tamanhoArquivo) ? ((janela-1)*TAMDADOSMAX+(tamanhoArquivo-sequencia*TAMDADOSMAX)) : sizeof(BufferJanela);
+                    qntGravar = (sequencia*TAMDADOSMAX > tamanhoArquivo) ? (janela-1)*TAMDADOSMAX+tamanhoArquivo-((sequencia-1)*TAMDADOSMAX) : TAMDADOSMAX*janela;
+                    printf("tamanho final: %u\ntamanho arquivo: %u\nqnt para gravar: %u -- %u\n", sequencia*TAMDADOSMAX, tamanhoArquivo, qntGravar, (janela-1)*TAMDADOSMAX+tamanhoArquivo-((sequencia-1)*TAMDADOSMAX));
                     fwrite(&BufferJanela, 1, qntGravar, arqDestino);
                     //    printf("Gravou no arquivo %s.\n",TempBufferJanela);
                     //}
                     dataToClient.flags = ACK;
+                    janela = dataFromClient->janela;
                     //printf("Desliza janela para %d.\n",janela);
                 }
                 else
