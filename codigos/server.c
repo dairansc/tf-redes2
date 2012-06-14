@@ -1,9 +1,11 @@
 #include "biblioteca.c"
 
+//Função externa que trata erros na comunicação por sock
 void DieWithError(char *errorMessage);  // External error handling function
 
-// Se o arquivo existir o valor 1 (true) será retornado. Caso
-// contrário a função retornará 0 (false).
+//Função que testa se já existe arquivo com o mesmo nome do 
+//arquivo enviado pelo cliente.
+//Retorna 1 (true) se arquivo existir e 0 (false) caso contrário.
 int file_exists(const char *filename)
 {
   FILE *arquivo;
@@ -19,7 +21,7 @@ int file_exists(const char *filename)
   return 0;
 }
 
-// Alterar nome do arquivo, em caso de teste em localhost.
+//Função que alterar nome do arquivo, em caso de teste em localhost.
 void altera_nome_arquivo (char nome_antigo[BUFFERMAX], int id_nome, char *nome_novo)
 {
     int tam = strlen(nome_antigo);
@@ -27,17 +29,15 @@ void altera_nome_arquivo (char nome_antigo[BUFFERMAX], int id_nome, char *nome_n
     //busca extensao do arquivo
     char *p = strrchr(nome_antigo, '.');
     *p++;
-
+    //renomea arquivo para nome_antigo+id.extensao
     strncat(nome_novo,nome_antigo,tam-4);
-    //printf("Novo nome de arquivo %s\n",nome_novo);
     sprintf(nome_novo, "%s%d.", nome_novo, id_nome);
     strcat(nome_novo, p);
-    //printf("Novo nome de arquivo %s\n",nome_novo);
 }
 
 int main(int argc, char *argv[])
 {
-    int Sock; // descritor de Socket
+    int Sock; 					 // descritor de Socket
     struct sockaddr_in servAddr; // Endereço destino
     struct sockaddr_in clntAddr; // Endereço origem
     
@@ -59,10 +59,9 @@ int main(int argc, char *argv[])
         fprintf(stderr,"Uso: %s [<Porta a ser aberta>]\nPorta padrão: %d\n", argv[0], PORTAPADRAO);
         exit(1);
     }
-
-    //printf("porta %d\n",Porta);
-    configuraPorta(argv[1]);// Testa se a porta do servidor está válida
-    //printf("porta %d\n",Porta);
+    
+    // Testa se a porta do servidor está válida
+    configuraPorta(argv[1]);
     // Cria socket para enviar/receber datagramas
     if ((Sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0)
         DieWithError("socket() failed");
@@ -77,12 +76,11 @@ int main(int argc, char *argv[])
     if (bind(Sock, (struct sockaddr *) &servAddr, sizeof(servAddr)) < 0)
         DieWithError("bind() failed");
 
-    for (;;) // Run forever
+    for (;;) // Garante que servidor ficará ativo a espera de mensagens do cliente
     {
         if (iniciaComunicacao == 0)
         {
-            // Bloqueado até que receba a mensagem do cliente
-
+            // Servidor fica bloqueado até que receba a mensagem do cliente
             printf("Aguardando comunicação do cliente...\n");
             memset(Buffer, 0, sizeof(Buffer));
             recebePacote(Sock,&clntAddr,servAddr, Buffer);
@@ -95,6 +93,7 @@ int main(int argc, char *argv[])
 			}
 			else
 			{
+				//Recebe campos do cabeçalho para criar arquivo na máquina serividora
 				janela = dataFromClient->janela;
 				sequencia = dataFromClient->sequencia;
 				arqProp = (struct fileHeader *)(Buffer+sizeof(struct datagramHeader));
@@ -105,7 +104,7 @@ int main(int argc, char *argv[])
 
 				strcpy(nome_arquivo, arqProp->nome);
 				id_nome = 2;
-
+                  
 				while (file_exists(nome_arquivo) == 1) {
 					memset(&nome_arquivo, 0, sizeof(nome_arquivo));
 					altera_nome_arquivo(arqProp->nome,id_nome,nome_arquivo);
@@ -116,18 +115,13 @@ int main(int argc, char *argv[])
 				dataToClient.sequencia = 0;
 				dataToClient.idRecebido = 0;
 				dataToClient.janela = janela;
-				//memset(dataToClient.dados, 0, TAMDADOSMAX);
 
 				if((arqDestino = fopen(nome_arquivo,"wb")) == NULL)
 				{
 					dataToClient.flags = FIM;
-					//strcpy(dataToClient.dados, "Erro ao abrir o arquivo");
 
 					printf("Erro ao abrir o arquivo cópia %s\n", nome_arquivo);
 					iniciaComunicacao = 0;
-					// Envia um datagrama de volta para o cliente informando erro
-					
-					//exit(1);
 				}
 				else
 				{
@@ -143,7 +137,7 @@ int main(int argc, char *argv[])
         }
         else if(iniciaComunicacao == 1)
         {
-
+            //Permanece nesse estado até que transmissão seja finalizada pelo cliente
             Reenviar = 1;
             while(Reenviar)
             {
@@ -165,27 +159,26 @@ int main(int argc, char *argv[])
                         exit(1);
                         
                     }
-                    else if(!Reenviar)
+                    else if(!Reenviar) //Recebeu o pacote da sequencia da janela
                     {
                         memcpy((BufferJanela+(TAMDADOSMAX*ContJanela)), Buffer+sizeof(struct datagramHeader), TAMDADOSMAX);
                         
                         Reenviar = (sequencia != dataFromClient->sequencia - 1) ? 1 : 0;
-                        //printf("Verificando sequencia atual %li com sequencia recebida %li. Tamanho do Buffer de Janela: %d\n",sequencia,dataFromClient->sequencia-1, TAMDADOSMAX*ContJanela);
                     }
                     sequencia = dataFromClient->sequencia;
                     janela = dataFromClient->janela;
                 }
-
-                if(!Reenviar)
+                
+                //Após receber a janela, verifica se ela veio completa 
+                if(!Reenviar) 
                 {
                     qntGravar = (sequencia*TAMDADOSMAX > tamanhoArquivo) ? (janela-1)*TAMDADOSMAX+tamanhoArquivo-((sequencia-1)*TAMDADOSMAX) : TAMDADOSMAX*janela;
-                    //printf("%s",BufferJanela);
                     fwrite(&BufferJanela, 1, qntGravar, arqDestino);
 
                     dataToClient.flags = ACK;
                     
                 }
-                else
+                else //Janela não foi recebida completamente, sinaliza cliente para reenvio da janela
                 {
                     dataToClient.flags = NACK;
                     printf("Pacotes perdidos, solicitando reenvio da janela...\n");
@@ -194,7 +187,6 @@ int main(int argc, char *argv[])
                 memset(Buffer, 0, sizeof(Buffer));
 				memcpy(Buffer, &(dataToClient), sizeof(dataToClient));
 				enviaPacote(Sock,clntAddr,Buffer,sizeof(dataToClient));
-				//printf("\n\n\nJanela:%d\n\n\n\n", janela);
 				printf("Recebendo o arquivo '%s' do cliente %s\n%li%c de %li Bytes\n", nome_arquivo, inet_ntoa(clntAddr.sin_addr), ((sequencia-1)*100)/(tamanhoArquivo/TAMDADOSMAX), '%', tamanhoArquivo);
             }
         }

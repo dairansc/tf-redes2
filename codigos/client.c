@@ -1,6 +1,7 @@
 #include "biblioteca.c"
 
-void DieWithError(char *errorMessage);  // External error handling function
+//Função externa que trata erros na comunicação por sock
+void DieWithError(char *errorMessage);   
 
 int main(int argc, char *argv[])
 {
@@ -37,9 +38,9 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    fseek(arqOrigem, 0, SEEK_END); // posiciona ponteiro no final do arquivo
-    arqProp.tamanho = ftell(arqOrigem);   // pega o valor corrente do ponteiro
-    fseek(arqOrigem, 0, SEEK_SET); // posiciona de volta no início do arquivo
+    fseek(arqOrigem, 0, SEEK_END); 			// posiciona ponteiro no final do arquivo
+    arqProp.tamanho = ftell(arqOrigem); 	// pega o valor corrente do ponteiro
+    fseek(arqOrigem, 0, SEEK_SET); 			// posiciona de volta no início do arquivo
 
     nomeArquivo = nomeBaseArquivo(nomeArquivo);
 
@@ -144,6 +145,7 @@ int main(int argc, char *argv[])
     memcpy(Buffer, &(dataToServer), sizeof(dataToServer));
     enviaPacote(Sock,servAddr,Buffer,sizeof(dataToServer));
 
+    //Encerra conexão
     close(Sock);
 	printf("Fim da transmissao.\n");
     return 0;
