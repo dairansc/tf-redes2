@@ -8,13 +8,15 @@ int main(int argc, char *argv[])
     struct sockaddr_in servAddr; // Endereço destino
     struct sockaddr_in fromAddr; // Endereço origem
 
-    struct fileHeader arqProp;
+    struct fileHeader arqProp, *teste;
     struct datagramHeader dataToServer;
     struct datagramHeader *dataFromServer = (struct datagramHeader*)malloc(sizeof(struct datagramHeader));
 
     char *servIP;                    // Endereço IP do servidor
     char *nomeArquivo;                // String com o nome do arquivo
+    char dados[TAMDADOSMAX];
 
+	int lastPos = 0;
 
     if ((argc < 3) || (argc > 4))    // Testa pelo número correto de argumentos
     {
@@ -63,36 +65,48 @@ int main(int argc, char *argv[])
     servAddr.sin_port   = htons(Porta);          // Porta do servidor
 
     // Limpa dados do datagrama
-    memset(dataToServer.dados, 0, TAMDADOSMAX);
+    memset(dados, 0, TAMDADOSMAX);
 
     dataToServer.flags = SYN;
     dataToServer.sequencia = 0;
     dataToServer.idRecebido = 0;
     dataToServer.janela = (TAMDADOSMAX*TAMJANELA < arqProp.tamanho) ? TAMJANELA : arqProp.tamanho/TAMDADOSMAX + 1;
-    memcpy(dataToServer.dados, &(arqProp), sizeof(struct fileHeader));
-
+    
+    memset(Buffer, 0, sizeof(Buffer));
+    memcpy(Buffer, &(dataToServer), sizeof(dataToServer));
+    memcpy(Buffer+sizeof(dataToServer), &(arqProp), sizeof(arqProp));
+    
+    /*int i;
+    for(i=0; i<BUFFERMAX; i++)
+	{
+		printf("|%u-%c", &Buffer[i], Buffer[i]);
+	}
+    teste = (struct fileHeader*)(Buffer+sizeof(dataToServer));
+        
+    printf("\nBuffer: %u, %d\nteste: %s\n", Buffer, sizeof(dataToServer), teste->nome);*/
+    
     // Envia cabeçalho do arquivo para o servidor
-    enviaPacote(Sock,servAddr,dataToServer);
+    enviaPacote(Sock,servAddr, Buffer, sizeof(dataToServer)+sizeof(arqProp)-NOMEARQUIVOMAX+strlen(arqProp.nome));
 
-    dataFromServer = recebePacote(Sock,&fromAddr,servAddr,1);
-
+    recebePacote(Sock,&fromAddr,servAddr,1, Buffer);
+	dataFromServer = (struct datagramHeader*)Buffer;
+	
     if((dataFromServer->flags & SYN) != SYN)
     {
         DieWithError("Conexão recusada!");
     }
-    else
-    {
-        printf("Inicialização OK!\n");
-    }
+    
+    printf("Conexão OK!\n");
 
 
     // Transfere conteudo do arquivo para servidor
     while(!feof(arqOrigem))
     {
+        
         memset(BufferJanela, 0, sizeof(BufferJanela));
         fread(&BufferJanela, 1, (TAMDADOSMAX * dataToServer.janela), arqOrigem);
 
-        printf("Conteúdo do bufferJanela %s\n",BufferJanela);
+        //printf("Conteúdo do bufferJanela %s\n",BufferJanela);
 
         Reenviar = 1;
         while(Reenviar)
@@ -101,15 +115,46 @@ int main(int argc, char *argv[])
             {
                 dataToServer.flags = ACK;
                 dataToServer.sequencia++;
-                memcpy(&(dataToServer.dados), (BufferJanela+TAMDADOSMAX*ContJanela), TAMDADOSMAX);
+                //memcpy(&(dataToServer.dados), (BufferJanela+TAMDADOSMAX*ContJanela), TAMDADOSMAX);
 
+				memset(Buffer, 0, sizeof(Buffer));
+				memcpy(Buffer, &(dataToServer), sizeof(dataToServer));
+				//fread(Buffer+sizeof(dataToServer), 1, TAMDADOSMAX, arqOrigem);
+				memcpy(Buffer+sizeof(dataToServer), (BufferJanela+TAMDADOSMAX*ContJanela), TAMDADOSMAX);
+int i;
+				//for(i=0; i<TAMDADOSMAX; i++){
+				//	Buffer[sizeof(dataToServer)+i] = BufferJanela[TAMDADOSMAX*ContJanela+i];
+				//}
+				
+
+for(i=sizeof(dataToServer); i<TAMDADOSMAX; i++)
+{
+	printf("%c", Buffer[i]);
+}
+/*printf("\n\n\n");
+
+for(i=0; i<TAMDADOSMAX*dataToServer.janela; i++)
+{
+	if(i<TAMDADOSMAX*ContJanela || i>TAMDADOSMAX*ContJanela+TAMDADOSMAX){
+		printf("%c", BufferJanela[i]);
+	}
+	else{
+		if(!(i%146)){
+			printf("\n");
+		}
+		printf("*");
+	}
+}*/
+printf("\n\n\n\n");
                 // Envia conteudo do arquivo para o servidor
-                printf("Conteúdo dos dados a serem enviados %s\n",dataToServer.dados);
-                enviaPacote(Sock,servAddr,dataToServer);
+                //printf("Conteúdo dos dados a serem enviados %s\n",BufferJanela);
+                enviaPacote(Sock,servAddr,Buffer,BUFFERMAX);
             }
 
             // Depois de enviar toda a janela, recebe uma resposta
-            dataFromServer = recebePacote(Sock,&fromAddr,servAddr,1);
+            memset(Buffer, 0, sizeof(Buffer));
+            recebePacote(Sock,&fromAddr,servAddr,1, Buffer);
+            dataFromServer = (struct datagramHeader*)Buffer;
             Reenviar = ((dataFromServer->flags & ACK) != ACK) ? 1 : 0;
             printf("Resposta do servidor se é para reenviar = %d\n",Reenviar);
         }
@@ -125,8 +170,10 @@ int main(int argc, char *argv[])
     // Envia sinalizacao do fim da tranferencia do arquivo para o servidor
     dataToServer.flags = FIM;
     dataToServer.sequencia = 0;
-
-    enviaPacote(Sock,servAddr,dataToServer);
+    
+	memset(Buffer, 0, sizeof(Buffer));
+    memcpy(Buffer, &(dataToServer), sizeof(dataToServer));
+    enviaPacote(Sock,servAddr,Buffer,sizeof(dataToServer));
 
     close(Sock);
 

@@ -9,11 +9,21 @@
 #include <unistd.h>     // for close()
 #include "DieWithError.c"
 
-#define BUFFERMAX 1500
+struct datagramHeader
+{
+    short flags;            // indicadores de conexão
+    long int sequencia;
+    long int idRecebido;    // Acknowlegement
+    int janela;             // tamanho da janela
+    //char dados[TAMDADOSMAX];
+};
+
+#define BUFFERMAX 1458
 #define PORTAPADRAO 10000
 
-#define TAMDADOSMAX (BUFFERMAX-sizeof(short)-sizeof(long int)-sizeof(long int)-sizeof(int))
-#define NOMEARQUIVOMAX (TAMDADOSMAX-sizeof(long int))
+#define TAMDADOSMAX (BUFFERMAX-sizeof(struct datagramHeader))
+#define NOMEARQUIVOMAX (TAMDADOSMAX-16)
+//#define NOMEARQUIVOMAX (TAMDADOSMAX-sizeof(long int))
 #define TAMJANELA 10
 
 // indicadores de conexão
@@ -28,19 +38,10 @@ struct fileHeader
     char nome[NOMEARQUIVOMAX];
 };
 
-struct datagramHeader
-{
-    short flags;            // indicadores de conexão
-    long int sequencia;
-    long int idRecebido;    // Acknowlegement
-    int janela;             // tamanho da janela
-    char dados[TAMDADOSMAX];
-};
-
-
 unsigned short Porta;     // Porta aberta de conexão
 FILE *arqOrigem, *arqDestino;              // Ponteiro para o arquivo
 short Reenviar;             // Indica se janela precisa ser reenviada
+char Buffer[BUFFERMAX];
 char BufferJanela[TAMDADOSMAX*TAMJANELA];
 char TempBufferJanela[TAMDADOSMAX];
 int ContJanela;
@@ -58,37 +59,37 @@ void configuraPorta(char *parametro)
     }
 }
 
-void enviaPacote(int Sock, struct sockaddr_in Addr, struct datagramHeader pacote)
+void enviaPacote(int Sock, struct sockaddr_in Addr, char *buffer, int quantidade)
 {
-    char buffer[BUFFERMAX];
+    //char buffer[BUFFERMAX];
 
-    printf("%d\n\n", pacote.janela);
+    //printf("%d\n\n", pacote.janela);
 
-    memset(buffer, 0, sizeof(buffer));
-    memcpy(buffer, &(pacote), sizeof(pacote));
+    //memset(buffer, 0, sizeof(buffer));
+    //memcpy(buffer, &(pacote), sizeof(pacote));
 
     printf("envia pacotes.\n");
 
-    if (sendto(Sock, buffer, BUFFERMAX, 0, (struct sockaddr *) &Addr, sizeof(Addr)) != BUFFERMAX)
+    if (sendto(Sock, buffer, quantidade, 0, (struct sockaddr *) &Addr, sizeof(Addr)) != quantidade)
         DieWithError("Error: sendto() sent a different number of bytes than expected");
 
     printf("enviou pacotes sem erro.\n");
 }
 
-struct datagramHeader *recebePacote(int Sock, struct sockaddr_in *fromAddr, struct sockaddr_in sourceAddr, short verificarOrigem)
+int recebePacote(int Sock, struct sockaddr_in *fromAddr, struct sockaddr_in sourceAddr, short verificarOrigem, char *buffer)
 {
-    char buffer[BUFFERMAX];
-   
+    //char buffer[BUFFERMAX];
+    int quantidade;
     struct sockaddr_in tempFromAddr;
     unsigned int fromSize = sizeof(tempFromAddr);
     
-    struct datagramHeader* recPacote = (struct datagramHeader*)malloc(sizeof(struct datagramHeader));
+    //struct datagramHeader* recPacote = (struct datagramHeader*)malloc(sizeof(struct datagramHeader));
 
     memset(buffer, 0, sizeof(buffer));
 
     // Recebe resposta
-    memset(buffer, 0, sizeof(buffer));
-    if ((recvfrom(Sock, buffer, BUFFERMAX, 0, (struct sockaddr *) &tempFromAddr, &fromSize)) != BUFFERMAX)
+    //memset(buffer, 0, sizeof(buffer));
+    if ((quantidade = recvfrom(Sock, buffer, BUFFERMAX, 0, (struct sockaddr *) &tempFromAddr, &fromSize)) > BUFFERMAX)
         DieWithError("recvfrom() failed");
     
     *fromAddr = tempFromAddr;
@@ -99,9 +100,9 @@ struct datagramHeader *recebePacote(int Sock, struct sockaddr_in *fromAddr, stru
         exit(1);
     }
 */
-    memcpy(recPacote, buffer, sizeof(buffer));
+    //memcpy(recPacote, buffer, sizeof(buffer));
 
-    return recPacote;
+    return quantidade;
 
 }
 

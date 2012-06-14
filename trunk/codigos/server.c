@@ -47,10 +47,11 @@ int main(int argc, char *argv[])
 
     char nome_arquivo[BUFFERMAX];
     int id_nome , iniciaComunicacao = 0, janela;
-    long int sequencia;
+    long int sequencia, tamanhoArquivo;
     char nome_teste[10] = "teste";
+    char dados[TAMDADOSMAX];
 
-	int i;
+	int i, qntRecebida, qntGravar;
 
     if (argc > 2)    // Testa pelo número correto de argumentos
     {
@@ -82,49 +83,66 @@ int main(int argc, char *argv[])
             // Bloqueado até que receba a mensagem do cliente
 
             printf("Antes de chamar o Recebe pacotes iniciaComunicacao == 0.\n");
-            dataFromClient = recebePacote(Sock,&clntAddr,servAddr,0);
-            janela = dataFromClient->janela;
-            sequencia = dataFromClient->sequencia;
-            arqProp = (struct fileHeader *)dataFromClient->dados;
+            memset(Buffer, 0, sizeof(Buffer));
+            recebePacote(Sock,&clntAddr,servAddr,0, Buffer);
+            //for(i=0; i<qntRecebida; i++)
+			//{
+			//	printf("|%u-%c", &Buffer[i], Buffer[i]);
+			//}
+			//printf("\n");
+			dataFromClient = (struct datagramHeader*)Buffer;
+			
+			if((dataFromClient->flags & SYN) != SYN)
+			{
+				printf("Informação recebida do ip %s, mas não é um pacote de sincronização\n", inet_ntoa(clntAddr.sin_addr));
+			}
+			else
+			{
+				janela = dataFromClient->janela;
+				sequencia = dataFromClient->sequencia;
+				arqProp = (struct fileHeader *)(Buffer+sizeof(struct datagramHeader));
+				tamanhoArquivo = arqProp->tamanho;
+				printf("Handling client %s\n", inet_ntoa(clntAddr.sin_addr));
+				printf("Received: %s\n", arqProp->nome);
 
-            printf("Handling client %s\n", inet_ntoa(clntAddr.sin_addr));
-            printf("Received: %s\n", arqProp->nome);
 
+				strcpy(nome_arquivo, arqProp->nome);
+				id_nome = 2;
 
-            strcpy(nome_arquivo, arqProp->nome);
-            id_nome = 2;
+				while (file_exists(nome_arquivo) == 1) {
+					memset(&nome_arquivo, 0, sizeof(nome_arquivo));
+					altera_nome_arquivo(arqProp->nome,id_nome,nome_arquivo);
+					id_nome++;
+				}
 
-            while (file_exists(nome_arquivo) == 1) {
-                memset(&nome_arquivo, 0, sizeof(nome_arquivo));
-                altera_nome_arquivo(arqProp->nome,id_nome,nome_arquivo);
-                id_nome++;
-            }
+				dataToClient.flags = 0;
+				dataToClient.sequencia = 0;
+				dataToClient.idRecebido = 0;
+				dataToClient.janela = janela;
+				//memset(dataToClient.dados, 0, TAMDADOSMAX);
 
-            dataToClient.flags = 0;
-            dataToClient.sequencia = 0;
-            dataToClient.idRecebido = 0;
-            dataToClient.janela = TAMJANELA;
-            memset(dataToClient.dados, 0, TAMDADOSMAX);
+				if((arqDestino = fopen(nome_arquivo,"wb")) == NULL)
+				{
+					dataToClient.flags = FIM;
+					//strcpy(dataToClient.dados, "Erro ao abrir o arquivo");
 
-            if((arqDestino = fopen(nome_arquivo,"wb")) == NULL)
-            {
-                dataToClient.flags = FIM;
-                strcpy(dataToClient.dados, "Erro ao abrir o arquivo");
+					printf("Erro ao abrir o arquivo cópia %s\n", nome_arquivo);
 
-                printf("%s cópia %s\n", dataToClient.dados, nome_arquivo);
-
-                // Envia um datagrama de volta para o cliente informando erro
-                enviaPacote(Sock,clntAddr,dataToClient);
-                //exit(1);
-            }
-            else
-            {
-                dataToClient.flags = SYN;
-                // Envia um datagrama de volta para o cliente confirmando inicio da comunicacao
-                enviaPacote(Sock,clntAddr,dataToClient);
-
-                iniciaComunicacao = 1;
-            }
+					// Envia um datagrama de volta para o cliente informando erro
+					
+					//exit(1);
+				}
+				else
+				{
+					dataToClient.flags = SYN;
+					// Envia um datagrama de volta para o cliente confirmando inicio da comunicacao
+					
+					iniciaComunicacao = 1;
+				}
+				memset(Buffer, 0, sizeof(Buffer));
+				memcpy(Buffer, &(dataToClient), sizeof(dataToClient));
+				enviaPacote(Sock,clntAddr,Buffer,sizeof(dataToClient));
+			}
         }
         else if(iniciaComunicacao == 1)
         {
@@ -138,23 +156,27 @@ int main(int argc, char *argv[])
                 {
                     //dataToServer.flags = ACK;
                     //dataToServer.sequencia++;
-                    dataFromClient = recebePacote(Sock,&clntAddr,servAddr,1);
+                    memset(Buffer, 0, sizeof(Buffer));
+                    recebePacote(Sock,&clntAddr,servAddr,1, Buffer);
+                    dataFromClient = (struct datagramHeader*)Buffer;
                     if((dataFromClient->flags & FIM) == FIM)
                     {
                         fclose(arqDestino);
-                        iniciaComunicacao = 0;
+                        iniciaComunicacao = 3;
+                        Reenviar = 0;
                         printf("Fim da transmissao.\n");
+                        
                     }
                     else if(!Reenviar)
                     {
-                        memcpy((BufferJanela+(TAMDADOSMAX*ContJanela)), dataFromClient->dados, TAMDADOSMAX);
+                        memcpy((BufferJanela+(TAMDADOSMAX*ContJanela)), Buffer+sizeof(struct datagramHeader), TAMDADOSMAX);
                         
                         Reenviar = (sequencia != dataFromClient->sequencia - 1) ? 1 : 0;
                         printf("Verificando sequencia atual %li com sequencia recebida %li. Tamanho do Buffer de Janela: %d\n",sequencia,dataFromClient->sequencia-1, TAMDADOSMAX*ContJanela);
                     }
                     sequencia = dataFromClient->sequencia;
                 }
-				for(i=0; i<TAMDADOSMAX*8; i++)
+				for(i=0; i<TAMDADOSMAX*janela; i++)
                 {
 					printf("%c", BufferJanela[i]);
 				}
@@ -179,18 +201,22 @@ int main(int argc, char *argv[])
 
                     //for(ContJanela=0; ContJanela<(TAMDADOSMAX*TAMJANELA); ContJanela++) {
                     //    printf("Copiou %d.\n",sizeof(TempBufferJanela));
-                        fwrite(&BufferJanela, 1, sizeof(BufferJanela), arqDestino);
+                    qntGravar = (sequencia*TAMDADOSMAX+TAMDADOSMAX > tamanhoArquivo) ? ((janela-1)*TAMDADOSMAX+(tamanhoArquivo-sequencia*TAMDADOSMAX)) : sizeof(BufferJanela);
+                    fwrite(&BufferJanela, 1, qntGravar, arqDestino);
                     //    printf("Gravou no arquivo %s.\n",TempBufferJanela);
                     //}
-                     
+                    dataToClient.flags = ACK;
                     //printf("Desliza janela para %d.\n",janela);
                 }
                 else
                 {
                     dataToClient.flags = NACK;
                     printf("Envio de NACK.\n",janela);
-                    enviaPacote(Sock,clntAddr,dataToClient);
+                    
                 }
+                memset(Buffer, 0, sizeof(Buffer));
+				memcpy(Buffer, &(dataToClient), sizeof(dataToClient));
+				enviaPacote(Sock,clntAddr,Buffer,sizeof(dataToClient));
             }
         }
         else
