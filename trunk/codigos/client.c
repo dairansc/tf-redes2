@@ -45,14 +45,14 @@ int main(int argc, char *argv[])
 
     if( strlen(nomeArquivo) > NOMEARQUIVOMAX)
     {
-        fprintf(stderr,"Nome de arquivo excede o tamanho máximo de %d!\n", NOMEARQUIVOMAX);
+        fprintf(stderr,"Nome de arquivo excede o tamanho máximo de %li!\n", NOMEARQUIVOMAX);
         exit(1);
     }
 
 
     sprintf(arqProp.nome, "%s", nomeArquivo);
 
-    printf("Abriu arquivo: %s\nTamanho: %li\n", arqProp.nome, arqProp.tamanho);
+    printf("Arquivo: %s\nTamanho: %li Bytes\n", arqProp.nome, arqProp.tamanho);
 
     // Cria um socket datagrama/UDP
     if ((Sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0)
@@ -76,27 +76,18 @@ int main(int argc, char *argv[])
     memcpy(Buffer, &(dataToServer), sizeof(dataToServer));
     memcpy(Buffer+sizeof(dataToServer), &(arqProp), sizeof(arqProp));
     
-    /*int i;
-    for(i=0; i<BUFFERMAX; i++)
-	{
-		printf("|%u-%c", &Buffer[i], Buffer[i]);
-	}
-    teste = (struct fileHeader*)(Buffer+sizeof(dataToServer));
-        
-    printf("\nBuffer: %u, %d\nteste: %s\n", Buffer, sizeof(dataToServer), teste->nome);*/
-    
     // Envia cabeçalho do arquivo para o servidor
     enviaPacote(Sock,servAddr, Buffer, sizeof(dataToServer)+sizeof(arqProp)-NOMEARQUIVOMAX+strlen(arqProp.nome));
 
-    recebePacote(Sock,&fromAddr,servAddr,1, Buffer);
+    recebePacote(Sock,&fromAddr,servAddr, Buffer);
 	dataFromServer = (struct datagramHeader*)Buffer;
 	
     if((dataFromServer->flags & SYN) != SYN)
     {
-        DieWithError("Conexão recusada!");
+        DieWithError("Conexão com o servidor recusada!");
     }
     
-    printf("Conexão OK!\n");
+    printf("Conexão com o servidor estabelecida, enviando dados...\n");
 
 
     // Transfere conteudo do arquivo para servidor
@@ -106,8 +97,6 @@ int main(int argc, char *argv[])
         memset(BufferJanela, 0, sizeof(BufferJanela));
         fread(&BufferJanela, 1, (TAMDADOSMAX * dataToServer.janela), arqOrigem);
 
-        //printf("Conteúdo do bufferJanela %s\n",BufferJanela);
-
         Reenviar = 1;
         while(Reenviar)
         {
@@ -115,54 +104,34 @@ int main(int argc, char *argv[])
             {
                 dataToServer.flags = ACK;
                 dataToServer.sequencia++;
-                //memcpy(&(dataToServer.dados), (BufferJanela+TAMDADOSMAX*ContJanela), TAMDADOSMAX);
 
 				memset(Buffer, 0, sizeof(Buffer));
 				memcpy(Buffer, &(dataToServer), sizeof(dataToServer));
-				//fread(Buffer+sizeof(dataToServer), 1, TAMDADOSMAX, arqOrigem);
 				memcpy(Buffer+sizeof(dataToServer), (BufferJanela+TAMDADOSMAX*ContJanela), TAMDADOSMAX);
-int i;
-				//for(i=0; i<TAMDADOSMAX; i++){
-				//	Buffer[sizeof(dataToServer)+i] = BufferJanela[TAMDADOSMAX*ContJanela+i];
-				//}
-				
-
-for(i=sizeof(dataToServer); i<TAMDADOSMAX; i++)
-{
-	printf("%c", Buffer[i]);
-}
-/*printf("\n\n\n");
-
-for(i=0; i<TAMDADOSMAX*dataToServer.janela; i++)
-{
-	if(i<TAMDADOSMAX*ContJanela || i>TAMDADOSMAX*ContJanela+TAMDADOSMAX){
-		printf("%c", BufferJanela[i]);
-	}
-	else{
-		if(!(i%146)){
-			printf("\n");
-		}
-		printf("*");
-	}
-}*/
-printf("\n\n\n\n");
+				//printf("%s",Buffer+sizeof(dataToServer));
                 // Envia conteudo do arquivo para o servidor
-                //printf("Conteúdo dos dados a serem enviados %s\n",BufferJanela);
                 enviaPacote(Sock,servAddr,Buffer,BUFFERMAX);
+                
             }
-
+			
             // Depois de enviar toda a janela, recebe uma resposta
             memset(Buffer, 0, sizeof(Buffer));
-            recebePacote(Sock,&fromAddr,servAddr,1, Buffer);
+            recebePacote(Sock,&fromAddr,servAddr, Buffer);
             dataFromServer = (struct datagramHeader*)Buffer;
             Reenviar = ((dataFromServer->flags & ACK) != ACK) ? 1 : 0;
-            printf("Resposta do servidor se é para reenviar = %d\n",Reenviar);
+            if(Reenviar){
+				dataToServer.sequencia -= dataToServer.janela;
+				printf("Servidor solicitou reenvio da janela.\n");
+			}
+            //printf("Resposta do servidor se é para reenviar = %d\n",Reenviar);
         }
-
+        
         // Ajusta tamanho da última janela
         dataToServer.janela = (TAMDADOSMAX*dataToServer.sequencia + dataToServer.janela*TAMDADOSMAX < arqProp.tamanho) ?
                                dataToServer.janela :
                                (arqProp.tamanho-TAMDADOSMAX*dataToServer.sequencia)/TAMDADOSMAX + 1;
+        //printf("\n\n\nJanela:%d->%d\n\n\n\n", i, dataToServer.janela);
+        printf("Enviando o arquivo '%s' para o servidor %s\n%li%c de %li Bytes\n", arqProp.nome, servIP, ((dataToServer.sequencia-1)*100)/(arqProp.tamanho/TAMDADOSMAX), '%', arqProp.tamanho);
     }
 
     fclose(arqOrigem);
@@ -176,6 +145,6 @@ printf("\n\n\n\n");
     enviaPacote(Sock,servAddr,Buffer,sizeof(dataToServer));
 
     close(Sock);
-
+	printf("Fim da transmissao.\n");
     return 0;
 }
