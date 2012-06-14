@@ -15,7 +15,6 @@ struct datagramHeader
     long int sequencia;
     long int idRecebido;    // Acknowlegement
     int janela;             // tamanho da janela
-    //char dados[TAMDADOSMAX];
 };
 
 #define BUFFERMAX 1458
@@ -24,7 +23,7 @@ struct datagramHeader
 #define TAMDADOSMAX (BUFFERMAX-sizeof(struct datagramHeader))
 #define NOMEARQUIVOMAX (TAMDADOSMAX-16)
 //#define NOMEARQUIVOMAX (TAMDADOSMAX-sizeof(long int))
-#define TAMJANELA 10
+#define TAMJANELA 50 // não utilizar valores maiores que 50 pois do contrário o programa fica instável devido ao consumo de memória
 
 // indicadores de conexão
 #define SYN   0x01
@@ -50,7 +49,7 @@ void configuraPorta(char *parametro)
 {
     if (!parametro || !atoi(parametro))
     {
-        printf("Atenção: Porta não definida, assumindo porta padrão '%d'.\n", PORTAPADRAO);
+        printf("Atenção: Porta do servidor não definida, assumindo porta padrão '%d'.\n", PORTAPADRAO);
         Porta = PORTAPADRAO;
     }
     else
@@ -61,34 +60,19 @@ void configuraPorta(char *parametro)
 
 void enviaPacote(int Sock, struct sockaddr_in Addr, char *buffer, int quantidade)
 {
-    //char buffer[BUFFERMAX];
-
-    //printf("%d\n\n", pacote.janela);
-
-    //memset(buffer, 0, sizeof(buffer));
-    //memcpy(buffer, &(pacote), sizeof(pacote));
-
-    printf("envia pacotes.\n");
-
     if (sendto(Sock, buffer, quantidade, 0, (struct sockaddr *) &Addr, sizeof(Addr)) != quantidade)
         DieWithError("Error: sendto() sent a different number of bytes than expected");
-
-    printf("enviou pacotes sem erro.\n");
 }
 
-int recebePacote(int Sock, struct sockaddr_in *fromAddr, struct sockaddr_in sourceAddr, short verificarOrigem, char *buffer)
+int recebePacote(int Sock, struct sockaddr_in *fromAddr, struct sockaddr_in sourceAddr, char *buffer)
 {
-    //char buffer[BUFFERMAX];
     int quantidade;
     struct sockaddr_in tempFromAddr;
     unsigned int fromSize = sizeof(tempFromAddr);
-    
-    //struct datagramHeader* recPacote = (struct datagramHeader*)malloc(sizeof(struct datagramHeader));
-
+	//printf("Aguardando recebimento...\n");
     memset(buffer, 0, sizeof(buffer));
 
     // Recebe resposta
-    //memset(buffer, 0, sizeof(buffer));
     if ((quantidade = recvfrom(Sock, buffer, BUFFERMAX, 0, (struct sockaddr *) &tempFromAddr, &fromSize)) > BUFFERMAX)
         DieWithError("recvfrom() failed");
     
@@ -100,7 +84,6 @@ int recebePacote(int Sock, struct sockaddr_in *fromAddr, struct sockaddr_in sour
         exit(1);
     }
 */
-    //memcpy(recPacote, buffer, sizeof(buffer));
 
     return quantidade;
 
